@@ -11,16 +11,16 @@ import java.util.UUID;
 
 @Getter
 public class StockOrder extends Order {
-    private final Car car;
+  private final Car car;
 
-    public StockOrder(OrderState state, UUID id, User client, User manager, BigDecimal price, Car car) {
-        super(state, id, client, manager, price);
-        this.car = car;
-    }
+  public StockOrder(
+      OrderState state, UUID id, User client, User manager, BigDecimal price, Car car) {
+    super(state, id, client, manager, price);
+    this.car = car;
+  }
 
-
-    @Override
-    public OrderState getNextStateAfterPaid() {
-        return new ReadyForIssueState();
-    }
+  @Override
+  public OrderState getNextStateAfterPaid() {
+    return new ReadyForIssueState();
+  }
 }

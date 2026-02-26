@@ -8,10 +8,11 @@ import java.util.UUID;
 
 @Getter
 public class ColorPart extends Part {
-    private final String color;
+  private final String color;
 
-    public ColorPart(UUID id, PartType type, BigDecimal price, List<UUID> compatibleModelIds, String color) {
-        super(id, type, price, compatibleModelIds);
-        this.color = color;
-    }
+  public ColorPart(
+      UUID id, PartType type, BigDecimal price, List<UUID> compatibleModelIds, String color) {
+    super(id, type, price, compatibleModelIds);
+    this.color = color;
+  }
 }

@@ -11,15 +11,21 @@ import java.util.UUID;
 
 @Getter
 public class CustomOrder extends Order {
-    private final CarConfiguration carConfiguration;
+  private final CarConfiguration carConfiguration;
 
-    public CustomOrder(OrderState state, UUID id, User client, User manager, BigDecimal price, CarConfiguration carConfiguration) {
-        super(state, id, client, manager, price);
-        this.carConfiguration = carConfiguration;
-    }
+  public CustomOrder(
+      OrderState state,
+      UUID id,
+      User client,
+      User manager,
+      BigDecimal price,
+      CarConfiguration carConfiguration) {
+    super(state, id, client, manager, price);
+    this.carConfiguration = carConfiguration;
+  }
 
-    @Override
-    public OrderState getNextStateAfterPaid() {
-        return new AwaitingDeliveryState();
-    }
+  @Override
+  public OrderState getNextStateAfterPaid() {
+    return new AwaitingDeliveryState();
+  }
 }

@@ -38,6 +38,7 @@ class TestDriveServiceTest {
         model.setId(UUID.randomUUID());
         model.setBrand("TestBrand");
         model.setPrice(new BigDecimal("1000000"));
+
         
         List<UUID> compatibleIds = List.of(model.getId());
         Part wheel = new Part(UUID.randomUUID(), PartType.WHEEL, BigDecimal.ZERO, compatibleIds);

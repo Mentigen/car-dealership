@@ -8,19 +8,25 @@ import org.example.domain.user.UserRepository;
 import java.util.List;
 
 @AllArgsConstructor
-public class UserService
-{
-    private final UserRepository userRepository;
+public class UserService {
+  private final UserRepository userRepository;
 
-    public List<User> findAll() { return userRepository.findAll(); }
+  public List<User> findAll() {
+    return userRepository.findAll();
+  }
 
-    public List<User> findByEmail(String email) { return userRepository.findByEmail(email); }
+  public List<User> findByEmail(String email) {
+    return userRepository.findByEmail(email);
+  }
 
-    public List<User> findByRole(Role role) { return userRepository.findByRole(role); }
+  public List<User> findByRole(Role role) {
+    return userRepository.findByRole(role);
+  }
 
-    public User register(String email, String password, String firstName, String lastName, String phone, Role role) {
-        User user = new User(firstName, lastName, role, email, phone, password);
+  public User register(
+      String email, String password, String firstName, String lastName, String phone, Role role) {
+    User user = new User(firstName, lastName, role, email, phone, password);
 
-        return  userRepository.save(user);
-    }
+    return userRepository.save(user);
+  }
 }

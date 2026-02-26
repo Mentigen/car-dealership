@@ -15,85 +15,89 @@ import java.util.UUID;
 
 @AllArgsConstructor
 public class TestDriveService {
-    private final CarRepository carRepository;
-    private final TestDriveRequestRepository requestRepository;
+  private final CarRepository carRepository;
+  private final TestDriveRequestRepository requestRepository;
 
-    public TestDriveRequest requestTestDrive(User client, Car car, LocalDateTime time) {
-        TestDriveRequest request = new TestDriveRequest(
-                UUID.randomUUID(), client, car, time, TestDriveStatus.PENDING);
-        requestRepository.save(request);
+  public TestDriveRequest requestTestDrive(User client, Car car, LocalDateTime time) {
+    TestDriveRequest request =
+        new TestDriveRequest(UUID.randomUUID(), client, car, time, TestDriveStatus.PENDING);
+    requestRepository.save(request);
 
-        return request;
+    return request;
+  }
+
+  public void approveRequest(UUID id) {
+    TestDriveRequest request =
+        requestRepository
+            .findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Request not found"));
+
+    if (request.getStatus() != TestDriveStatus.PENDING) {
+      throw new IllegalStateException("Only PENDING requests can be approved");
     }
 
-    public void approveRequest(UUID id) {
-        TestDriveRequest request = requestRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Request not found"));
+    TestDriveRequest approvedRequest =
+        new TestDriveRequest(
+            request.getId(),
+            request.getClient(),
+            request.getCar(),
+            request.getStartTime(),
+            TestDriveStatus.APPROVED);
 
-        if (request.getStatus() != TestDriveStatus.PENDING) {
-            throw new IllegalStateException("Only PENDING requests can be approved");
-        }
+    requestRepository.save(approvedRequest);
+  }
 
-        TestDriveRequest approvedRequest = new TestDriveRequest(
-                request.getId(),
-                request.getClient(),
-                request.getCar(),
-                request.getStartTime(),
-                TestDriveStatus.APPROVED
-        );
+  public void rejectRequest(UUID id) {
+    TestDriveRequest request =
+        requestRepository
+            .findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Request not found"));
 
-        requestRepository.save(approvedRequest);
-
+    if (request.getStatus() == TestDriveStatus.DONE) {
+      throw new IllegalStateException("DONE requests cannot be cancelled");
     }
 
-    public void rejectRequest(UUID id) {
-        TestDriveRequest request = requestRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Request not found"));
+    TestDriveRequest cancelledRequest =
+        new TestDriveRequest(
+            request.getId(),
+            request.getClient(),
+            request.getCar(),
+            request.getStartTime(),
+            TestDriveStatus.CANCELLED);
 
-        if (request.getStatus() == TestDriveStatus.DONE) {
-            throw new IllegalStateException("DONE requests cannot be cancelled");
-        }
+    requestRepository.save(cancelledRequest);
+  }
 
-        TestDriveRequest cancelledRequest = new TestDriveRequest(
-                request.getId(),
-                request.getClient(),
-                request.getCar(),
-                request.getStartTime(),
-                TestDriveStatus.CANCELLED
-        );
+  public void completeRequest(UUID id) {
+    TestDriveRequest request =
+        requestRepository
+            .findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Request not found"));
 
-        requestRepository.save(cancelledRequest);
+    if (request.getStatus() != TestDriveStatus.APPROVED) {
+      throw new IllegalStateException("Only APPROVED requests can be complete");
     }
 
-    public void completeRequest(UUID id) {
-        TestDriveRequest request = requestRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Request not found"));
+    TestDriveRequest completeRequest =
+        new TestDriveRequest(
+            request.getId(),
+            request.getClient(),
+            request.getCar(),
+            request.getStartTime(),
+            TestDriveStatus.DONE);
 
-        if (request.getStatus() != TestDriveStatus.APPROVED) {
-            throw new IllegalStateException("Only APPROVED requests can be complete");
-        }
+    requestRepository.save(completeRequest);
+  }
 
-        TestDriveRequest completeRequest = new TestDriveRequest(
-                request.getId(),
-                request.getClient(),
-                request.getCar(),
-                request.getStartTime(),
-                TestDriveStatus.DONE
-        );
+  public List<Car> getTestDriveCars() {
+    return carRepository.findTestDriveCars();
+  }
 
-        requestRepository.save(completeRequest);
-    }
+  public void addCarToTestDrive(Car car) {
+    carRepository.addTestDriveCar(car.getId());
+  }
 
-    public List<Car> getTestDriveCars() {
-        return carRepository.findTestDriveCars();
-    }
-
-    public void addCarToTestDrive(Car car) {
-        carRepository.addTestDriveCar(car.getId());
-    }
-
-    public void removeCarFromTestDrive(Car car) {
-        carRepository.removeTestDriveCar(car.getId());
-    }
-
+  public void removeCarFromTestDrive(Car car) {
+    carRepository.removeTestDriveCar(car.getId());
+  }
 }

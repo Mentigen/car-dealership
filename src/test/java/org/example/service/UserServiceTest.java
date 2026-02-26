@@ -32,6 +32,7 @@ class UserServiceTest {
         
         assertNotNull(registered);
         assertEquals("Ivan", registered.getFirstName());
+
         
         List<User> found = userRepository.findByEmail("ivan@ya.ru");
         assertFalse(found.isEmpty());

@@ -28,6 +28,7 @@ class CarConfigurationTest {
         modelBMW.setModelName("320i");
         modelBMW.setPrice(new BigDecimal("3000000"));
 
+        
         List<UUID> compatibleIds = List.of(modelBMW.getId());
         
         wheelPart = new Part(UUID.randomUUID(), PartType.WHEEL, new BigDecimal("50000"), compatibleIds);

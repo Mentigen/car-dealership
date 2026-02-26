@@ -11,23 +11,23 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 public abstract class Order {
-    private OrderState state;
-    private final UUID id;
-    private final User client;
-    private final User manager;
-    private final BigDecimal price;
+  private OrderState state;
+  private final UUID id;
+  private final User client;
+  private final User manager;
+  private final BigDecimal price;
 
-    public void changeState(OrderState newState) {
-        this.state = newState;
-    }
+  public void changeState(OrderState newState) {
+    this.state = newState;
+  }
 
-    public void next() {
-        this.state.next(this);
-    }
+  public void next() {
+    this.state.next(this);
+  }
 
-    public void cancel() {
-        this.state.cancel(this);
-    }
+  public void cancel() {
+    this.state.cancel(this);
+  }
 
-    public abstract OrderState getNextStateAfterPaid();
+  public abstract OrderState getNextStateAfterPaid();
 }

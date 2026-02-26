@@ -5,8 +5,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface PartRepository {
-    public Optional<Part> findById(UUID id);
-    public List<Part> findAll();
-    public Part save(Part part);
-    public void delete(UUID id);
+  public Optional<Part> findById(UUID id);
+
+  public List<Part> findAll();
+
+  public Part save(Part part);
+
+  public void delete(UUID id);
 }

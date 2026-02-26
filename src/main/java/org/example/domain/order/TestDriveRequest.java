@@ -11,9 +11,9 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 public class TestDriveRequest {
-    private final UUID id;
-    private final User client;
-    private final Car car;
-    private final LocalDateTime startTime;
-    private final TestDriveStatus status;
+  private final UUID id;
+  private final User client;
+  private final Car car;
+  private final LocalDateTime startTime;
+  private final TestDriveStatus status;
 }

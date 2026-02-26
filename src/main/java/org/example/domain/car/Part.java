@@ -14,12 +14,12 @@ import java.util.UUID;
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
 public class Part {
-    private UUID id;
-    private PartType type;
-    private BigDecimal price;
-    private List<UUID> compatibleModelIds;
+  private UUID id;
+  private PartType type;
+  private BigDecimal price;
+  private List<UUID> compatibleModelIds;
 
-    public boolean isCompatibleWith(CarModel model) {
-        return compatibleModelIds.contains(model.getId());
-    }
+  public boolean isCompatibleWith(CarModel model) {
+    return compatibleModelIds.contains(model.getId());
+  }
 }
