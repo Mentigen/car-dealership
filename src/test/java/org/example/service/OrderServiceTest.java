@@ -44,7 +44,6 @@ class OrderServiceTest {
 
     manager = new User("Petr", "Petrov", Role.MANAGER, "petr@gmail.com", "001", "petr007");
 
-    
     userRepository.save(client);
     userRepository.save(manager);
 

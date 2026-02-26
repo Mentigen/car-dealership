@@ -15,180 +15,185 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class CarServiceTest {
 
-    private CarService carService;
-    private InMemoryCarRepository carRepository;
-    private InMemoryPartRepository partRepository;
-    private InMemoryCarModelRepository carModelRepository;
+  private CarService carService;
+  private InMemoryCarRepository carRepository;
+  private InMemoryPartRepository partRepository;
+  private InMemoryCarModelRepository carModelRepository;
 
-    private CarModel modelBMW;
-    private Part wheelPart;
-    private Part transmissionPart;
-    private Part steeringWheelPart;
-    private Part interiorPart;
-    private Part colorPart;
+  private CarModel modelBMW;
+  private Part wheelPart;
+  private Part transmissionPart;
+  private Part steeringWheelPart;
+  private Part interiorPart;
+  private Part colorPart;
 
-    
-    @BeforeEach
-    void setUp() {
-        carRepository = new InMemoryCarRepository();
-        partRepository = new InMemoryPartRepository();
-        carModelRepository = new InMemoryCarModelRepository();
-        carService = new CarService(carModelRepository, partRepository, carRepository);
+  @BeforeEach
+  void setUp() {
+    carRepository = new InMemoryCarRepository();
+    partRepository = new InMemoryPartRepository();
+    carModelRepository = new InMemoryCarModelRepository();
+    carService = new CarService(carModelRepository, partRepository, carRepository);
 
-        setupTestData();
-    }
+    setupTestData();
+  }
 
-    private void setupTestData() {
-        modelBMW = new CarModel();
-        modelBMW.setId(UUID.randomUUID());
-        modelBMW.setBrand("BMW");
-        modelBMW.setModelName("320i");
-        modelBMW.setEnginePower(184);
-        modelBMW.setEngineVolume(2.0);
-        modelBMW.setFuel(FuelType.PETROL);
-        modelBMW.setBody(BodyType.SEDAN);
-        modelBMW.setDrive(DriveType.RWD);
-        modelBMW.setPrice(new BigDecimal("3000000"));
-        carModelRepository.save(modelBMW);
+  private void setupTestData() {
+    modelBMW = new CarModel();
+    modelBMW.setId(UUID.randomUUID());
+    modelBMW.setBrand("BMW");
+    modelBMW.setModelName("320i");
+    modelBMW.setEnginePower(184);
+    modelBMW.setEngineVolume(2.0);
+    modelBMW.setFuel(FuelType.PETROL);
+    modelBMW.setBody(BodyType.SEDAN);
+    modelBMW.setDrive(DriveType.RWD);
+    modelBMW.setPrice(new BigDecimal("3000000"));
+    carModelRepository.save(modelBMW);
 
-        List<UUID> compatibleIds = List.of(modelBMW.getId());
+    List<UUID> compatibleIds = List.of(modelBMW.getId());
 
-        wheelPart = new Part(UUID.randomUUID(), PartType.WHEEL, new BigDecimal("50000"), compatibleIds);
-        transmissionPart = new TransmissionPart(UUID.randomUUID(), PartType.TRANSMISSION, new BigDecimal("100000"), compatibleIds, TransmissionType.AUTOMATIC);
-        steeringWheelPart = new Part(UUID.randomUUID(), PartType.STEERING_WHEEL, new BigDecimal("20000"), compatibleIds);
-        interiorPart = new Part(UUID.randomUUID(), PartType.INTERIOR, new BigDecimal("150000"), compatibleIds);
-        colorPart = new ColorPart(UUID.randomUUID(), PartType.COLOR, new BigDecimal("0"), compatibleIds, "Black");
+    wheelPart = new Part(UUID.randomUUID(), PartType.WHEEL, new BigDecimal("50000"), compatibleIds);
+    transmissionPart =
+        new TransmissionPart(
+            UUID.randomUUID(),
+            PartType.TRANSMISSION,
+            new BigDecimal("100000"),
+            compatibleIds,
+            TransmissionType.AUTOMATIC);
+    steeringWheelPart =
+        new Part(
+            UUID.randomUUID(), PartType.STEERING_WHEEL, new BigDecimal("20000"), compatibleIds);
+    interiorPart =
+        new Part(UUID.randomUUID(), PartType.INTERIOR, new BigDecimal("150000"), compatibleIds);
+    colorPart =
+        new ColorPart(
+            UUID.randomUUID(), PartType.COLOR, new BigDecimal("0"), compatibleIds, "Black");
 
-        partRepository.save(wheelPart);
-        partRepository.save(transmissionPart);
-        partRepository.save(steeringWheelPart);
-        partRepository.save(interiorPart);
-        partRepository.save(colorPart);
-    }
+    partRepository.save(wheelPart);
+    partRepository.save(transmissionPart);
+    partRepository.save(steeringWheelPart);
+    partRepository.save(interiorPart);
+    partRepository.save(colorPart);
+  }
 
-    @Test
-    void testSearchCarsByBrandAndModel() {
-        CarConfiguration config = new CarConfiguration.Builder(modelBMW)
-                .addPart(wheelPart)
-                .addPart(transmissionPart)
-                .addPart(steeringWheelPart)
-                .addPart(interiorPart)
-                .addPart(colorPart)
-                .build();
-        
-        Car car = new Car(UUID.randomUUID(), config);
-        carService.addCar(car);
+  @Test
+  void testSearchCarsByBrandAndModel() {
+    CarConfiguration config =
+        new CarConfiguration.Builder(modelBMW)
+            .addPart(wheelPart)
+            .addPart(transmissionPart)
+            .addPart(steeringWheelPart)
+            .addPart(interiorPart)
+            .addPart(colorPart)
+            .build();
 
-        CarFilter filter = CarFilter.builder()
-                .brand("BMW")
-                .modelName("320i")
-                .build();
-        
-        List<Car> foundCars = carService.searchCars(filter);
-        
-        assertEquals(1, foundCars.size());
-        assertEquals("BMW", foundCars.get(0).getCarConfiguration().getModel().getBrand());
-    }
+    Car car = new Car(UUID.randomUUID(), config);
+    carService.addCar(car);
 
-    @Test
-    void testSearchCarsByColor() {
-        CarConfiguration config = new CarConfiguration.Builder(modelBMW)
-                .addPart(wheelPart)
-                .addPart(transmissionPart)
-                .addPart(steeringWheelPart)
-                .addPart(interiorPart)
-                .addPart(colorPart)
-                .build();
+    CarFilter filter = CarFilter.builder().brand("BMW").modelName("320i").build();
 
-        Car car = new Car(UUID.randomUUID(), config);
-        carService.addCar(car);
+    List<Car> foundCars = carService.searchCars(filter);
 
-        CarFilter firstFilter = CarFilter.builder()
-                .color("Black")
-                .build();
+    assertEquals(1, foundCars.size());
+    assertEquals("BMW", foundCars.get(0).getCarConfiguration().getModel().getBrand());
+  }
 
-        CarFilter secondFilter = CarFilter.builder()
-                .color("White")
-                .build();
+  @Test
+  void testSearchCarsByColor() {
+    CarConfiguration config =
+        new CarConfiguration.Builder(modelBMW)
+            .addPart(wheelPart)
+            .addPart(transmissionPart)
+            .addPart(steeringWheelPart)
+            .addPart(interiorPart)
+            .addPart(colorPart)
+            .build();
 
-        List<Car> firstFoundCars = carService.searchCars(firstFilter);
-        List<Car> secondFoundCars = carService.searchCars(secondFilter);
+    Car car = new Car(UUID.randomUUID(), config);
+    carService.addCar(car);
 
-        assertEquals(1, firstFoundCars.size());
-        assertEquals(0, secondFoundCars.size());
-    }
+    CarFilter firstFilter = CarFilter.builder().color("Black").build();
 
-    @Test
-    void testSearchCarsByTransmission() {
-        CarConfiguration config = new CarConfiguration.Builder(modelBMW)
-                .addPart(wheelPart)
-                .addPart(transmissionPart)
-                .addPart(steeringWheelPart)
-                .addPart(interiorPart)
-                .addPart(colorPart)
-                .build();
+    CarFilter secondFilter = CarFilter.builder().color("White").build();
 
-        Car car = new Car(UUID.randomUUID(), config);
-        carService.addCar(car);
+    List<Car> firstFoundCars = carService.searchCars(firstFilter);
+    List<Car> secondFoundCars = carService.searchCars(secondFilter);
 
-        CarFilter firstFilter = CarFilter.builder()
-                .transmissionType(TransmissionType.AUTOMATIC)
-                .build();
+    assertEquals(1, firstFoundCars.size());
+    assertEquals(0, secondFoundCars.size());
+  }
 
-        CarFilter secondFilter = CarFilter.builder()
-                .transmissionType(TransmissionType.MANUAL)
-                .build();
+  @Test
+  void testSearchCarsByTransmission() {
+    CarConfiguration config =
+        new CarConfiguration.Builder(modelBMW)
+            .addPart(wheelPart)
+            .addPart(transmissionPart)
+            .addPart(steeringWheelPart)
+            .addPart(interiorPart)
+            .addPart(colorPart)
+            .build();
 
-        List<Car> firstFoundCars = carService.searchCars(firstFilter);
-        List<Car> secondFoundCars = carService.searchCars(secondFilter);
+    Car car = new Car(UUID.randomUUID(), config);
+    carService.addCar(car);
 
-        assertEquals(1, firstFoundCars.size());
-        assertEquals(0, secondFoundCars.size());
-    }
+    CarFilter firstFilter =
+        CarFilter.builder().transmissionType(TransmissionType.AUTOMATIC).build();
 
-    @Test
-    void testUpdateCar() {
-        CarConfiguration config = new CarConfiguration.Builder(modelBMW)
-                .addPart(wheelPart)
-                .addPart(transmissionPart)
-                .addPart(steeringWheelPart)
-                .addPart(interiorPart)
-                .addPart(colorPart)
-                .build();
-        Car car = new Car(UUID.randomUUID(), config);
-        carService.addCar(car);
-        
-        Car updated = carService.updateCar(car.getId(), config);
-        assertEquals(config, updated.getCarConfiguration());
-    }
-    
-    @Test
-    void testDeleteCar() {
-        CarConfiguration config = new CarConfiguration.Builder(modelBMW)
-                .addPart(wheelPart)
-                .addPart(transmissionPart)
-                .addPart(steeringWheelPart)
-                .addPart(interiorPart)
-                .addPart(colorPart)
-                .build();
-        Car car = new Car(UUID.randomUUID(), config);
-        carService.addCar(car);
-        
-        carService.deleteCar(car.getId());
-        CarFilter filter = CarFilter.builder().brand("BMW").build();
-        assertTrue(carService.searchCars(filter).isEmpty());
-    }
-    
-    @Test
-    void testGetAvailablePartsForModel() {
-        List<Part> parts = carService.getAvailablePartsForModel(modelBMW.getId());
-        assertEquals(5, parts.size());
-    }
-    
-    @Test
-    void testFindAllModels() {
-        List<CarModel> models = carService.findAll();
-        assertEquals(1, models.size());
-        assertEquals(modelBMW, models.get(0));
-    }
+    CarFilter secondFilter = CarFilter.builder().transmissionType(TransmissionType.MANUAL).build();
+
+    List<Car> firstFoundCars = carService.searchCars(firstFilter);
+    List<Car> secondFoundCars = carService.searchCars(secondFilter);
+
+    assertEquals(1, firstFoundCars.size());
+    assertEquals(0, secondFoundCars.size());
+  }
+
+  @Test
+  void testUpdateCar() {
+    CarConfiguration config =
+        new CarConfiguration.Builder(modelBMW)
+            .addPart(wheelPart)
+            .addPart(transmissionPart)
+            .addPart(steeringWheelPart)
+            .addPart(interiorPart)
+            .addPart(colorPart)
+            .build();
+    Car car = new Car(UUID.randomUUID(), config);
+    carService.addCar(car);
+
+    Car updated = carService.updateCar(car.getId(), config);
+    assertEquals(config, updated.getCarConfiguration());
+  }
+
+  @Test
+  void testDeleteCar() {
+    CarConfiguration config =
+        new CarConfiguration.Builder(modelBMW)
+            .addPart(wheelPart)
+            .addPart(transmissionPart)
+            .addPart(steeringWheelPart)
+            .addPart(interiorPart)
+            .addPart(colorPart)
+            .build();
+    Car car = new Car(UUID.randomUUID(), config);
+    carService.addCar(car);
+
+    carService.deleteCar(car.getId());
+    CarFilter filter = CarFilter.builder().brand("BMW").build();
+    assertTrue(carService.searchCars(filter).isEmpty());
+  }
+
+  @Test
+  void testGetAvailablePartsForModel() {
+    List<Part> parts = carService.getAvailablePartsForModel(modelBMW.getId());
+    assertEquals(5, parts.size());
+  }
+
+  @Test
+  void testFindAllModels() {
+    List<CarModel> models = carService.findAll();
+    assertEquals(1, models.size());
+    assertEquals(modelBMW, models.get(0));
+  }
 }
