@@ -6,6 +6,7 @@ import org.example.domain.user.User;
 import org.example.domain.user.UserRepository;
 
 import java.util.List;
+import java.util.UUID;
 
 @AllArgsConstructor
 public class UserService {
@@ -25,7 +26,7 @@ public class UserService {
 
   public User register(
       String email, String password, String firstName, String lastName, String phone, Role role) {
-    User user = new User(firstName, lastName, role, email, phone, password);
+    User user = new User(UUID.randomUUID(), firstName, lastName, role, email, phone, password);
 
     return userRepository.save(user);
   }

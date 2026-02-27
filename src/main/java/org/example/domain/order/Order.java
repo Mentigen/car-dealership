@@ -1,14 +1,14 @@
 package org.example.domain.order;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 import org.example.domain.order.state.OrderState;
 import org.example.domain.user.User;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
-@AllArgsConstructor
+@SuperBuilder
 @Getter
 public abstract class Order {
   private OrderState state;

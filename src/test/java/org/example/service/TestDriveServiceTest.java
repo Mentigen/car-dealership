@@ -1,9 +1,7 @@
 package org.example.service;
 
 import org.example.domain.car.*;
-import org.example.domain.exceptions.EntityNotFoundException;
 import org.example.domain.order.TestDriveRequest;
-import org.example.domain.order.TestDriveStatus;
 import org.example.domain.user.Role;
 import org.example.domain.user.User;
 import org.example.infrastructure.repository.InMemoryCarRepository;
@@ -32,7 +30,8 @@ class TestDriveServiceTest {
     requestRepository = new InMemoryTestDriveRequestRepository();
     testDriveService = new TestDriveService(carRepository, requestRepository);
 
-    client = new User("Ivan", "Ivanov", Role.CUSTOMER, "ivan@ya.ru", "123", "pass");
+    client =
+        new User(UUID.randomUUID(), "Ivan", "Ivanov", Role.CUSTOMER, "ivan@ya.ru", "123", "pass");
 
     CarModel model = new CarModel();
     model.setId(UUID.randomUUID());
@@ -74,7 +73,7 @@ class TestDriveServiceTest {
 
     assertNotNull(request);
     assertNotNull(request.getId());
-    assertEquals(TestDriveStatus.PENDING, request.getStatus());
+    assertEquals("PENDING", request.getState().getName());
     assertEquals(client, request.getClient());
     assertEquals(car, request.getCar());
   }
@@ -87,7 +86,7 @@ class TestDriveServiceTest {
     testDriveService.approveRequest(request.getId());
 
     TestDriveRequest updated = requestRepository.findById(request.getId()).orElseThrow();
-    assertEquals(TestDriveStatus.APPROVED, updated.getStatus());
+    assertEquals("APPROVED", updated.getState().getName());
   }
 
   @Test
@@ -98,7 +97,7 @@ class TestDriveServiceTest {
     testDriveService.rejectRequest(request.getId());
 
     TestDriveRequest updated = requestRepository.findById(request.getId()).orElseThrow();
-    assertEquals(TestDriveStatus.CANCELLED, updated.getStatus());
+    assertEquals("CANCELLED", updated.getState().getName());
   }
 
   @Test
@@ -110,7 +109,7 @@ class TestDriveServiceTest {
     testDriveService.completeRequest(request.getId());
 
     TestDriveRequest updated = requestRepository.findById(request.getId()).orElseThrow();
-    assertEquals(TestDriveStatus.DONE, updated.getStatus());
+    assertEquals("DONE", updated.getState().getName());
   }
 
   @Test

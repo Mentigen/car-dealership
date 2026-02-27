@@ -43,60 +43,20 @@ public class CarService {
   }
 
   public List<Car> searchCars(CarFilter filter) {
+    filter.validate();
     return carRepository.findAll().stream()
+        .filter(CarSpecifications.hasBrand(filter.getBrand()))
+        .filter(CarSpecifications.hasModel(filter.getModelName()))
+        .filter(CarSpecifications.hasBodyType(filter.getBodyType()))
+        .filter(CarSpecifications.hasFuelType(filter.getFuelType()))
+        .filter(CarSpecifications.hasDriveType(filter.getDriveType()))
+        .filter(CarSpecifications.hasPriceBetween(filter.getMinPrice(), filter.getMaxPrice()))
+        .filter(CarSpecifications.hasPowerBetween(filter.getMinPower(), filter.getMaxPower()))
         .filter(
-            car -> {
-              CarModel model = car.getCarConfiguration().getModel();
-
-              if (filter.getMinPrice() != null
-                  && car.getPrice().compareTo(filter.getMinPrice()) < 0) return false;
-              if (filter.getMaxPrice() != null
-                  && car.getPrice().compareTo(filter.getMaxPrice()) > 0) return false;
-
-              if (filter.getBrand() != null
-                  && !model.getBrand().equalsIgnoreCase(filter.getBrand())) return false;
-              if (filter.getModelName() != null
-                  && !model.getModelName().equalsIgnoreCase(filter.getModelName())) return false;
-
-              if (filter.getBodyType() != null && model.getBody() != filter.getBodyType())
-                return false;
-              if (filter.getFuelType() != null && model.getFuel() != filter.getFuelType())
-                return false;
-              if (filter.getDriveType() != null && model.getDrive() != filter.getDriveType())
-                return false;
-
-              if (filter.getMinPower() != null && model.getEnginePower() < filter.getMinPower())
-                return false;
-              if (filter.getMaxPower() != null && model.getEnginePower() > filter.getMaxPower())
-                return false;
-              if (filter.getMinEngineVolume() != null
-                  && model.getEngineVolume() < filter.getMinEngineVolume()) return false;
-              if (filter.getMaxEngineVolume() != null
-                  && model.getEngineVolume() > filter.getMaxEngineVolume()) return false;
-
-              if (filter.getColor() != null) {
-                boolean hasColor =
-                    car.getCarConfiguration().getParts().stream()
-                        .filter(part -> part instanceof ColorPart)
-                        .map(part -> (ColorPart) part)
-                        .anyMatch(
-                            colorPart -> colorPart.getColor().equalsIgnoreCase(filter.getColor()));
-
-                if (!hasColor) return false;
-              }
-
-              if (filter.getTransmissionType() != null) {
-                boolean hasTransmission =
-                    car.getCarConfiguration().getParts().stream()
-                        .filter(part -> part instanceof TransmissionPart)
-                        .map(part -> (TransmissionPart) part)
-                        .anyMatch(tp -> tp.getTransmissionType() == filter.getTransmissionType());
-
-                if (!hasTransmission) return false;
-              }
-
-              return true;
-            })
+            CarSpecifications.hasEngineVolumeBetween(
+                filter.getMinEngineVolume(), filter.getMaxEngineVolume()))
+        .filter(CarSpecifications.hasColor(filter.getColor()))
+        .filter(CarSpecifications.hasTransmissionType(filter.getTransmissionType()))
         .toList();
   }
 }

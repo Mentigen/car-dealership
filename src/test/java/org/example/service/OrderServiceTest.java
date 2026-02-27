@@ -40,9 +40,9 @@ class OrderServiceTest {
     partRepository = new InMemoryPartRepository();
     carModelRepository = new InMemoryCarModelRepository();
 
-    client = new User("Ivan", "Ivanov", Role.CUSTOMER, "ivan@ya.ru", "88005553535", "ivan228");
+    client = new User(UUID.randomUUID(), "Ivan", "Ivanov", Role.CUSTOMER, "ivan@ya.ru", "88005553535", "ivan228");
 
-    manager = new User("Petr", "Petrov", Role.MANAGER, "petr@gmail.com", "001", "petr007");
+    manager = new User(UUID.randomUUID(), "Petr", "Petrov", Role.MANAGER, "petr@gmail.com", "001", "petr007");
 
     userRepository.save(client);
     userRepository.save(manager);

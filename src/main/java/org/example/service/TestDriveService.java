@@ -6,7 +6,7 @@ import org.example.domain.car.CarRepository;
 import org.example.domain.exceptions.EntityNotFoundException;
 import org.example.domain.order.TestDriveRequest;
 import org.example.domain.order.TestDriveRequestRepository;
-import org.example.domain.order.TestDriveStatus;
+import org.example.domain.order.testDriveState.PendingState;
 import org.example.domain.user.User;
 
 import java.time.LocalDateTime;
@@ -20,7 +20,7 @@ public class TestDriveService {
 
   public TestDriveRequest requestTestDrive(User client, Car car, LocalDateTime time) {
     TestDriveRequest request =
-        new TestDriveRequest(UUID.randomUUID(), client, car, time, TestDriveStatus.PENDING);
+        new TestDriveRequest(UUID.randomUUID(), client, car, time, new PendingState());
     requestRepository.save(request);
 
     return request;
@@ -32,19 +32,8 @@ public class TestDriveService {
             .findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Request not found"));
 
-    if (request.getStatus() != TestDriveStatus.PENDING) {
-      throw new IllegalStateException("Only PENDING requests can be approved");
-    }
-
-    TestDriveRequest approvedRequest =
-        new TestDriveRequest(
-            request.getId(),
-            request.getClient(),
-            request.getCar(),
-            request.getStartTime(),
-            TestDriveStatus.APPROVED);
-
-    requestRepository.save(approvedRequest);
+    request.approve();
+    requestRepository.save(request);
   }
 
   public void rejectRequest(UUID id) {
@@ -53,19 +42,8 @@ public class TestDriveService {
             .findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Request not found"));
 
-    if (request.getStatus() == TestDriveStatus.DONE) {
-      throw new IllegalStateException("DONE requests cannot be cancelled");
-    }
-
-    TestDriveRequest cancelledRequest =
-        new TestDriveRequest(
-            request.getId(),
-            request.getClient(),
-            request.getCar(),
-            request.getStartTime(),
-            TestDriveStatus.CANCELLED);
-
-    requestRepository.save(cancelledRequest);
+    request.reject();
+    requestRepository.save(request);
   }
 
   public void completeRequest(UUID id) {
@@ -74,19 +52,8 @@ public class TestDriveService {
             .findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Request not found"));
 
-    if (request.getStatus() != TestDriveStatus.APPROVED) {
-      throw new IllegalStateException("Only APPROVED requests can be complete");
-    }
-
-    TestDriveRequest completeRequest =
-        new TestDriveRequest(
-            request.getId(),
-            request.getClient(),
-            request.getCar(),
-            request.getStartTime(),
-            TestDriveStatus.DONE);
-
-    requestRepository.save(completeRequest);
+    request.complete();
+    requestRepository.save(request);
   }
 
   public List<Car> getTestDriveCars() {

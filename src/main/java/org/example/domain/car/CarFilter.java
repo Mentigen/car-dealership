@@ -2,6 +2,7 @@ package org.example.domain.car;
 
 import lombok.Builder;
 import lombok.Getter;
+import org.example.domain.exceptions.DomainValidationException;
 
 import java.math.BigDecimal;
 
@@ -23,4 +24,25 @@ public class CarFilter {
   private TransmissionType transmissionType;
   private String color;
   private DriveType driveType;
+
+  public void validate() {
+      if (minPower != null && minPower < 0) {
+          throw new DomainValidationException("Min power cannot be negative");
+      }
+      if (maxPower != null && maxPower < 0) {
+          throw new DomainValidationException("Max power cannot be negative");
+      }
+      if (minPrice != null && minPrice.compareTo(BigDecimal.ZERO) < 0) {
+          throw new DomainValidationException("Min price cannot be negative");
+      }
+      if (maxPrice != null && maxPrice.compareTo(BigDecimal.ZERO) < 0) {
+          throw new DomainValidationException("Max price cannot be negative");
+      }
+      if (minEngineVolume != null && minEngineVolume < 0) {
+          throw new DomainValidationException("Min engine volume cannot be negative");
+      }
+      if (maxEngineVolume != null && maxEngineVolume < 0) {
+          throw new DomainValidationException("Max engine volume cannot be negative");
+      }
+  }
 }

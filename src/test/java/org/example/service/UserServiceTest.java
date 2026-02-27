@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -23,7 +24,7 @@ class UserServiceTest {
     userRepository = new InMemoryUserRepository();
     userService = new UserService(userRepository);
 
-    user = new User("Ivan", "Ivanov", Role.CUSTOMER, "ivan@ya.ru", "123", "pass");
+    user = new User(UUID.randomUUID(), "Ivan", "Ivanov", Role.CUSTOMER, "ivan@ya.ru", "123", "pass");
   }
 
   @Test

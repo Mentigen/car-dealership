@@ -42,9 +42,14 @@ public class OrderService {
     if (managers.isEmpty()) throw new IllegalStateException("No managers available");
     User manager = managers.get(new Random().nextInt(managers.size()));
 
-    StockOrder order =
-        new StockOrder(
-            new CreatedStockState(), UUID.randomUUID(), client, manager, car.getPrice(), car);
+    StockOrder order = StockOrder.builder()
+            .state(new CreatedStockState())
+            .id(UUID.randomUUID())
+            .client(client)
+            .manager(manager)
+            .price(car.getPrice())
+            .car(car)
+            .build();
 
     orderRepository.save(order);
 
@@ -56,14 +61,14 @@ public class OrderService {
     if (managers.isEmpty()) throw new IllegalStateException("No managers available");
     User manager = managers.get(new Random().nextInt(managers.size()));
 
-    CustomOrder order =
-        new CustomOrder(
-            new CreatedCustomState(),
-            UUID.randomUUID(),
-            client,
-            manager,
-            carConfiguration.getPrice(),
-            carConfiguration);
+    CustomOrder order = CustomOrder.builder()
+            .state(new CreatedCustomState())
+            .id(UUID.randomUUID())
+            .client(client)
+            .manager(manager)
+            .price(carConfiguration.getPrice())
+            .carConfiguration(carConfiguration)
+            .build();
 
     orderRepository.save(order);
 

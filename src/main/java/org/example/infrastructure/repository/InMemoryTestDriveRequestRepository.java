@@ -11,7 +11,7 @@ public class InMemoryTestDriveRequestRepository implements TestDriveRequestRepos
   @Override
   public List<TestDriveRequest> findByStatus(String status) {
     return storage.values().stream()
-        .filter(request -> request.getStatus().name().equalsIgnoreCase(status))
+        .filter(request -> request.getState().getName().equalsIgnoreCase(status))
         .toList();
   }
 
