@@ -53,7 +53,7 @@ public class CarConfiguration {
 
     public CarConfiguration build() {
       REQUIRED_PART_TYPES.stream()
-          .filter(type -> parts.stream().noneMatch(p -> p.getType() == type))
+          .filter(type -> parts.stream().noneMatch(p -> p.getType().equals(type)))
           .findFirst()
           .ifPresent(
               missingType -> {
