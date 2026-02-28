@@ -1,7 +1,6 @@
 package CarDealership.service;
 
 import CarDealership.domain.car.*;
-import org.example.domain.car.*;
 import CarDealership.infrastructure.repository.InMemoryCarModelRepository;
 import CarDealership.infrastructure.repository.InMemoryCarRepository;
 import CarDealership.infrastructure.repository.InMemoryPartRepository;

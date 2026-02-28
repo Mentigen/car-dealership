@@ -7,7 +7,6 @@ import CarDealership.domain.order.StockOrder;
 import lombok.AllArgsConstructor;
 import CarDealership.domain.car.Car;
 import CarDealership.domain.car.CarConfiguration;
-import org.example.domain.order.*;
 import CarDealership.domain.order.state.CreatedCustomState;
 import CarDealership.domain.order.state.CreatedStockState;
 import CarDealership.domain.user.Role;

@@ -5,12 +5,11 @@ import CarDealership.infrastructure.repository.InMemoryCarModelRepository;
 import CarDealership.infrastructure.repository.InMemoryOrderRepository;
 import CarDealership.infrastructure.repository.InMemoryPartRepository;
 import CarDealership.infrastructure.repository.InMemoryUserRepository;
-import org.example.domain.car.*;
 import CarDealership.domain.order.CustomOrder;
 import CarDealership.domain.order.StockOrder;
 import CarDealership.domain.user.Role;
 import CarDealership.domain.user.User;
-import org.example.infrastructure.repository.*;
+import CarDealership.infrastructure.repository.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

@@ -2,7 +2,6 @@ package CarDealership.service;
 
 import CarDealership.domain.car.*;
 import lombok.AllArgsConstructor;
-import org.example.domain.car.*;
 import CarDealership.domain.exceptions.EntityNotFoundException;
 
 import java.util.List;

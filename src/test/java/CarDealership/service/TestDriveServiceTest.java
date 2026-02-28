@@ -1,7 +1,6 @@
 package CarDealership.service;
 
 import CarDealership.domain.car.*;
-import org.example.domain.car.*;
 import CarDealership.domain.order.TestDriveRequest;
 import CarDealership.domain.user.Role;
 import CarDealership.domain.user.User;
