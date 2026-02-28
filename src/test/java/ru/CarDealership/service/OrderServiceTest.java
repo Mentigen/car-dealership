@@ -1,6 +1,6 @@
 package ru.CarDealership.service;
 
-import CarDealership.domain.car.*;
+import ru.CarDealership.domain.car.*;
 import ru.CarDealership.domain.car.*;
 import ru.CarDealership.infrastructure.repository.InMemoryCarModelRepository;
 import ru.CarDealership.infrastructure.repository.InMemoryOrderRepository;
@@ -10,7 +10,7 @@ import ru.CarDealership.domain.order.CustomOrder;
 import ru.CarDealership.domain.order.StockOrder;
 import ru.CarDealership.domain.user.Role;
 import ru.CarDealership.domain.user.User;
-import CarDealership.infrastructure.repository.*;
+import ru.CarDealership.infrastructure.repository.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
