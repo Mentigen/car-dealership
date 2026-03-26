@@ -9,9 +9,9 @@ import ru.CarDealership.domain.car.BodyType;
 import ru.CarDealership.domain.car.DriveType;
 import ru.CarDealership.domain.car.FuelType;
 
-import java.awt.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "car_models")

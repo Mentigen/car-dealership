@@ -7,9 +7,11 @@ import ru.CarDealership.domain.exceptions.IncompatibleComponentException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 public class CarConfiguration {
+  private UUID id;
   private CarModel model;
   private List<Part> parts;
 
@@ -21,9 +23,14 @@ public class CarConfiguration {
           PartType.INTERIOR,
           PartType.COLOR);
 
-  private CarConfiguration(CarModel model, List<Part> parts) {
+  private CarConfiguration(UUID id, CarModel model, List<Part> parts) {
+    this.id = id;
     this.model = model;
     this.parts = parts;
+  }
+
+  public static CarConfiguration reconstruct(UUID id, CarModel model, List<Part> parts) {
+    return new CarConfiguration(id, model, parts);
   }
 
   public BigDecimal getPrice() {
@@ -58,7 +65,7 @@ public class CarConfiguration {
                 throw new DomainValidationException("Missing required part type: " + missingType);
               });
 
-      return new CarConfiguration(this.model, this.parts);
+      return new CarConfiguration(UUID.randomUUID(), this.model, this.parts);
     }
   }
 }
