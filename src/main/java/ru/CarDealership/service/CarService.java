@@ -2,12 +2,14 @@ package ru.CarDealership.service;
 
 import ru.CarDealership.domain.car.*;
 import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
 import ru.CarDealership.domain.car.*;
 import ru.CarDealership.domain.exceptions.EntityNotFoundException;
 
 import java.util.List;
 import java.util.UUID;
 
+@Service
 @AllArgsConstructor
 public class CarService {
   private final CarModelRepository carModelRepository;
@@ -29,6 +31,23 @@ public class CarService {
 
   void deleteCar(UUID id) {
     carRepository.delete(id);
+  }
+
+  public List<Car> findAllCars() {
+    return carRepository.findAll();
+  }
+
+  public Car findCarById(UUID id) {
+    return carRepository.findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Car not found"));
+  }
+
+  public CarConfiguration findConfigurationById(UUID configId) {
+    return carRepository.findAll().stream()
+            .map(Car::getCarConfiguration)
+            .filter(c -> c.getId().equals(configId))
+            .findFirst()
+            .orElseThrow(() -> new EntityNotFoundException("Car configuration not found"));
   }
 
   public List<CarModel> findAll() {

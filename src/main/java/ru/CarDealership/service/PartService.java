@@ -1,6 +1,7 @@
 package ru.CarDealership.service;
 
 import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
 import ru.CarDealership.domain.car.Part;
 import ru.CarDealership.domain.car.PartRepository;
 import ru.CarDealership.domain.exceptions.EntityNotFoundException;
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Service
 @AllArgsConstructor
 public class PartService {
   private final PartRepository partRepository;

@@ -5,8 +5,10 @@ import ru.CarDealership.domain.order.Order;
 import ru.CarDealership.domain.order.OrderRepository;
 import ru.CarDealership.domain.order.StockOrder;
 import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
 import ru.CarDealership.domain.car.Car;
 import ru.CarDealership.domain.car.CarConfiguration;
+import ru.CarDealership.domain.exceptions.EntityNotFoundException;
 import ru.CarDealership.domain.order.state.CreatedCustomState;
 import ru.CarDealership.domain.order.state.CreatedStockState;
 import ru.CarDealership.domain.user.Role;
@@ -18,6 +20,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 
+@Service
 @AllArgsConstructor
 public class OrderService {
   private final OrderRepository orderRepository;
@@ -80,18 +83,14 @@ public class OrderService {
   }
 
   public Order nextStep(UUID id) {
-    Order order = findOrderById(id).orElseThrow(() -> new IllegalStateException("Order not found"));
-
+    Order order = findOrderById(id).orElseThrow(() -> new EntityNotFoundException("Order not found"));
     order.next();
-
-    return order;
+    return orderRepository.save(order);
   }
 
   public Order cancelOrder(UUID id) {
-    Order order = findOrderById(id).orElseThrow(() -> new IllegalStateException("Order not found"));
-
+    Order order = findOrderById(id).orElseThrow(() -> new EntityNotFoundException("Order not found"));
     order.cancel();
-
-    return order;
+    return orderRepository.save(order);
   }
 }
