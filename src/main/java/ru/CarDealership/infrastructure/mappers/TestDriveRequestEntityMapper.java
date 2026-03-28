@@ -33,13 +33,15 @@ public class TestDriveRequestEntityMapper {
     }
 
     public TestDriveRequestEntity toEntity(TestDriveRequest testDriveRequest) {
-        var entity = new TestDriveRequestEntity();
+        var carStub = new CarEntity();
+        carStub.setId(testDriveRequest.getCar().getId());
+        var entity = new TestDriveRequestEntity(
+                userMapper.toEntity(testDriveRequest.getClient()),
+                carStub,
+                testDriveRequest.getStartTime(),
+                testDriveRequest.getState().getName()
+        );
         entity.setId(testDriveRequest.getId());
-        entity.setClient(userMapper.toEntity(testDriveRequest.getClient()));
-        entity.setCar(new ru.CarDealership.infrastructure.entity.CarEntity());
-        entity.getCar().setId(testDriveRequest.getCar().getId());
-        entity.setStartTime(testDriveRequest.getStartTime());
-        entity.setStatus(testDriveRequest.getState().getName());
         return entity;
     }
 }

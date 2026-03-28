@@ -1,5 +1,8 @@
 package ru.CarDealership.infrastructure.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import ru.CarDealership.domain.car.Car;
 import ru.CarDealership.domain.car.CarConfiguration;
 import ru.CarDealership.domain.car.CarFilter;
@@ -40,8 +43,8 @@ public class InMemoryCarRepository implements CarRepository {
   }
 
   @Override
-  public List<Car> findFiltered(CarFilter filter) {
-    return storage.values().stream()
+  public Page<Car> findFiltered(CarFilter filter, Pageable pageable) {
+    List<Car> filtered = storage.values().stream()
         .filter(CarSpecifications.hasBrand(filter.getBrand()))
         .filter(CarSpecifications.hasModel(filter.getModelName()))
         .filter(CarSpecifications.hasBodyType(filter.getBodyType()))
@@ -53,6 +56,16 @@ public class InMemoryCarRepository implements CarRepository {
         .filter(CarSpecifications.hasColor(filter.getColor()))
         .filter(CarSpecifications.hasTransmissionType(filter.getTransmissionType()))
         .toList();
+    
+    int start = (int) pageable.getOffset();
+    int end = Math.min(start + pageable.getPageSize(), filtered.size());
+    
+    if (start > filtered.size()) {
+      return new PageImpl<>(new ArrayList<>(), pageable, filtered.size());
+    }
+    
+    List<Car> pageContent = filtered.subList(start, end);
+    return new PageImpl<>(pageContent, pageable, filtered.size());
   }
 
   @Override
@@ -76,5 +89,19 @@ public class InMemoryCarRepository implements CarRepository {
   @Override
   public List<Car> findTestDriveCars() {
     return testDriveCars.stream().map(storage::get).filter(Objects::nonNull).toList();
+  }
+
+  @Override
+  public Page<Car> findAll(Pageable pageable) {
+    List<Car> allCars = new ArrayList<>(storage.values());
+    int start = (int)  pageable.getOffset();
+    int end = Math.min(start + pageable.getPageSize(), allCars.size());
+
+    if (start > allCars.size()) {
+      return new PageImpl<>(new ArrayList<>(), pageable, allCars.size());
+    }
+
+    List<Car> pageContent = allCars.subList(start, end);
+    return new PageImpl<>(pageContent, pageable, allCars.size());
   }
 }

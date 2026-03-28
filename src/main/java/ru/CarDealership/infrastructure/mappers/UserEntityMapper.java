@@ -19,14 +19,15 @@ public class UserEntityMapper {
     }
 
     public UserEntity toEntity(User user) {
-        UserEntity entity = new UserEntity();
+        var entity = new UserEntity(
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
+                user.getPhone(),
+                user.getPasswordHash(),
+                user.getRole()
+        );
         entity.setId(user.getId());
-        entity.setFirstName(user.getFirstName());
-        entity.setLastName(user.getLastName());
-        entity.setRole(user.getRole());
-        entity.setEmail(user.getEmail());
-        entity.setPhone(user.getPhone());
-        entity.setPasswordHash(user.getPasswordHash());
         return entity;
     }
 }

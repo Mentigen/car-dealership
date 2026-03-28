@@ -7,6 +7,8 @@ import ru.CarDealership.domain.car.EngineVolume;
 import ru.CarDealership.domain.car.Price;
 import ru.CarDealership.infrastructure.entity.CarModelEntity;
 
+import java.util.ArrayList;
+
 @Component
 public class CarModelEntityMapper {
     public CarModel toDomain(CarModelEntity entity) {
@@ -24,16 +26,18 @@ public class CarModelEntityMapper {
     }
 
     public CarModelEntity toEntity(CarModel model) {
-        CarModelEntity entity = new CarModelEntity();
+        var entity = new CarModelEntity(
+                model.getBrand(),
+                model.getModelName(),
+                model.getPrice().getValue(),
+                model.getEnginePower().getValue(),
+                model.getEngineVolume().getValue(),
+                model.getFuel(),
+                model.getBody(),
+                model.getDrive(),
+                new ArrayList<>()
+        );
         entity.setId(model.getId());
-        entity.setBrand(model.getBrand());
-        entity.setModelName(model.getModelName());
-        entity.setPrice(model.getPrice().getValue());
-        entity.setEnginePower(model.getEnginePower().getValue());
-        entity.setEngineVolume(model.getEngineVolume().getValue());
-        entity.setFuelType(model.getFuel());
-        entity.setBody(model.getBody());
-        entity.setDrive(model.getDrive());
         return entity;
     }
 }

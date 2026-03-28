@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import ru.CarDealership.domain.car.BodyType;
 import ru.CarDealership.domain.car.DriveType;
 import ru.CarDealership.domain.car.FuelType;
@@ -15,7 +14,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "car_models")
-@Getter @Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class CarModelEntity extends BaseEntity {

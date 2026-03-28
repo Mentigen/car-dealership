@@ -1,5 +1,9 @@
 package ru.CarDealership.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import ru.CarDealership.api.dto.CarFilterRequest;
 import ru.CarDealership.domain.car.*;
 import ru.CarDealership.infrastructure.repository.InMemoryCarModelRepository;
 import ru.CarDealership.infrastructure.repository.InMemoryCarRepository;
@@ -90,12 +94,15 @@ class CarServiceTest {
     Car car = new Car(UUID.randomUUID(), config);
     carService.addCar(car);
 
-    CarFilter filter = CarFilter.builder().brand("BMW").modelName("320i").build();
+    CarFilterRequest filterRequest = new CarFilterRequest();
+    filterRequest.setBrand("BMW");
+    filterRequest.setModelName("320i");
+    Pageable pageable = PageRequest.of(0, 10);
 
-    List<Car> foundCars = carService.searchCars(filter);
+    Page<Car> foundCars = carService.searchCars(filterRequest, pageable);
 
-    assertEquals(1, foundCars.size());
-    assertEquals("BMW", foundCars.get(0).getCarConfiguration().getModel().getBrand());
+    assertEquals(1, foundCars.getTotalElements());
+    assertEquals("BMW", foundCars.getContent().get(0).getCarConfiguration().getModel().getBrand());
   }
 
   @Test
@@ -112,15 +119,18 @@ class CarServiceTest {
     Car car = new Car(UUID.randomUUID(), config);
     carService.addCar(car);
 
-    CarFilter firstFilter = CarFilter.builder().color("Black").build();
+    CarFilterRequest firstFilterRequest = new CarFilterRequest();
+    firstFilterRequest.setColor("Black");
+    Pageable pageable = PageRequest.of(0, 10);
 
-    CarFilter secondFilter = CarFilter.builder().color("White").build();
+    CarFilterRequest secondFilterRequest = new CarFilterRequest();
+    secondFilterRequest.setColor("White");
 
-    List<Car> firstFoundCars = carService.searchCars(firstFilter);
-    List<Car> secondFoundCars = carService.searchCars(secondFilter);
+    Page<Car> firstFoundCars = carService.searchCars(firstFilterRequest, pageable);
+    Page<Car> secondFoundCars = carService.searchCars(secondFilterRequest, pageable);
 
-    assertEquals(1, firstFoundCars.size());
-    assertEquals(0, secondFoundCars.size());
+    assertEquals(1, firstFoundCars.getTotalElements());
+    assertEquals(0, secondFoundCars.getTotalElements());
   }
 
   @Test
@@ -137,16 +147,18 @@ class CarServiceTest {
     Car car = new Car(UUID.randomUUID(), config);
     carService.addCar(car);
 
-    CarFilter firstFilter =
-        CarFilter.builder().transmissionType(TransmissionType.AUTOMATIC).build();
+    CarFilterRequest firstFilterRequest = new CarFilterRequest();
+    firstFilterRequest.setTransmissionType(TransmissionType.AUTOMATIC);
+    Pageable pageable = PageRequest.of(0, 10);
 
-    CarFilter secondFilter = CarFilter.builder().transmissionType(TransmissionType.MANUAL).build();
+    CarFilterRequest secondFilterRequest = new CarFilterRequest();
+    secondFilterRequest.setTransmissionType(TransmissionType.MANUAL);
 
-    List<Car> firstFoundCars = carService.searchCars(firstFilter);
-    List<Car> secondFoundCars = carService.searchCars(secondFilter);
+    Page<Car> firstFoundCars = carService.searchCars(firstFilterRequest, pageable);
+    Page<Car> secondFoundCars = carService.searchCars(secondFilterRequest, pageable);
 
-    assertEquals(1, firstFoundCars.size());
-    assertEquals(0, secondFoundCars.size());
+    assertEquals(1, firstFoundCars.getTotalElements());
+    assertEquals(0, secondFoundCars.getTotalElements());
   }
 
   @Test
@@ -180,8 +192,10 @@ class CarServiceTest {
     carService.addCar(car);
 
     carService.deleteCar(car.getId());
-    CarFilter filter = CarFilter.builder().brand("BMW").build();
-    assertTrue(carService.searchCars(filter).isEmpty());
+    CarFilterRequest filterRequest = new CarFilterRequest();
+    filterRequest.setBrand("BMW");
+    Pageable pageable = PageRequest.of(0, 10);
+    assertTrue(carService.searchCars(filterRequest, pageable).isEmpty());
   }
 
   @Test

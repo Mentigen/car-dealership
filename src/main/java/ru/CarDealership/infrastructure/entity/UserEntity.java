@@ -4,12 +4,11 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import ru.CarDealership.domain.user.Role;
 
 @Entity
 @Table(name = "users")
-@Getter @Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserEntity extends BaseEntity {

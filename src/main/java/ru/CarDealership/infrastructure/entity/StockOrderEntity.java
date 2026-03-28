@@ -7,10 +7,11 @@ import lombok.Setter;
 
 @Entity
 @DiscriminatorValue("STOCK")
-@Getter @Setter
+@Getter
 @NoArgsConstructor
 public class StockOrderEntity extends OrderEntity {
-    @ManyToOne(fetch = FetchType.EAGER)
+    @Setter
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "car_id")
     private CarEntity car;
 }

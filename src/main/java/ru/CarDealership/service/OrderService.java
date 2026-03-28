@@ -6,6 +6,7 @@ import ru.CarDealership.domain.order.OrderRepository;
 import ru.CarDealership.domain.order.StockOrder;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.CarDealership.domain.car.Car;
 import ru.CarDealership.domain.car.CarConfiguration;
 import ru.CarDealership.domain.exceptions.EntityNotFoundException;
@@ -22,22 +23,27 @@ import java.util.UUID;
 
 @Service
 @AllArgsConstructor
+@Transactional
 public class OrderService {
   private final OrderRepository orderRepository;
   private final UserRepository userRepository;
 
+  @Transactional(readOnly = true)
   public List<Order> findOrders() {
     return orderRepository.findAll();
   }
 
+  @Transactional(readOnly = true)
   public Optional<Order> findOrderById(UUID id) {
     return orderRepository.findById(id);
   }
 
+  @Transactional(readOnly = true)
   public List<Order> findOrderByManager(User manager) {
     return orderRepository.findByManager(manager);
   }
 
+  @Transactional(readOnly = true)
   public List<Order> findOrdersByCustomer(User customer) {
     return orderRepository.findByCustomer(customer);
   }

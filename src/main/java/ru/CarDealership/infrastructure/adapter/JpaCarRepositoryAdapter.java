@@ -1,5 +1,7 @@
 package ru.CarDealership.infrastructure.adapter;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import ru.CarDealership.domain.car.Car;
 import ru.CarDealership.domain.car.CarConfiguration;
@@ -43,6 +45,11 @@ public class JpaCarRepositoryAdapter implements CarRepository {
     }
 
     @Override
+    public Page<Car> findAll(Pageable pageable) {
+        return jpaRepository.findAll(pageable).map(mapper::toDomain);
+    }
+
+    @Override
     public Optional<CarConfiguration> findByConfigurationId(UUID configId) {
         return jpaRepository.findByCarConfiguration_Id(configId)
                 .map(mapper::toDomain)
@@ -50,10 +57,9 @@ public class JpaCarRepositoryAdapter implements CarRepository {
     }
 
     @Override
-    public List<Car> findFiltered(CarFilter filter) {
-        return jpaRepository.findAll(CarEntitySpecifications.fromFilter(filter)).stream()
-                .map(mapper::toDomain)
-                .toList();
+    public Page<Car> findFiltered(CarFilter filter, Pageable pageable) {
+        return jpaRepository.findAll(CarEntitySpecifications.fromFilter(filter), pageable)
+                .map(mapper::toDomain);
     }
 
     @Override

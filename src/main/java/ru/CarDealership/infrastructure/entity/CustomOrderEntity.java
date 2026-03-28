@@ -7,9 +7,10 @@ import lombok.Setter;
 
 @Entity
 @DiscriminatorValue("CUSTOM")
-@Getter @Setter
+@Getter
 @NoArgsConstructor
 public class CustomOrderEntity extends OrderEntity {
+    @Setter
     @ManyToOne(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "car_configuration_id")
     private CarConfigurationEntity carConfiguration;

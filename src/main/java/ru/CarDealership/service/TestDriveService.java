@@ -2,6 +2,7 @@ package ru.CarDealership.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.CarDealership.domain.car.Car;
 import ru.CarDealership.domain.car.CarRepository;
 import ru.CarDealership.domain.exceptions.EntityNotFoundException;
@@ -16,6 +17,7 @@ import java.util.UUID;
 
 @Service
 @AllArgsConstructor
+@Transactional
 public class TestDriveService {
   private final CarRepository carRepository;
   private final TestDriveRequestRepository requestRepository;
@@ -58,10 +60,12 @@ public class TestDriveService {
     requestRepository.save(request);
   }
 
+  @Transactional(readOnly = true)
   public List<TestDriveRequest> findAll() {
     return requestRepository.findAll();
   }
 
+  @Transactional(readOnly = true)
   public List<Car> getTestDriveCars() {
     return carRepository.findTestDriveCars();
   }

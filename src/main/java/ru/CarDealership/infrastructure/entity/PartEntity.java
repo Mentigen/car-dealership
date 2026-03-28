@@ -16,19 +16,23 @@ import java.util.List;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "part_kind", discriminatorType = DiscriminatorType.STRING)
 @DiscriminatorValue("PART")
-@Getter @Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class PartEntity extends BaseEntity {
+    @Setter
     @Column(name = "type", nullable = false)
     private String type;
 
+    @Setter
     @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal price;
 
+    @Setter
     @Column
     private String color;
 
+    @Setter
     @Enumerated(EnumType.STRING)
     @Column
     private TransmissionType transmissionType;

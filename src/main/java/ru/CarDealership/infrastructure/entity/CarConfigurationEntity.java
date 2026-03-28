@@ -4,14 +4,13 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "car_configurations")
-@Getter @Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class CarConfigurationEntity extends BaseEntity {
