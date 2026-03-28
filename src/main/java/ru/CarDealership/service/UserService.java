@@ -20,9 +20,7 @@ public class UserService {
   }
 
   public User findById(UUID id) {
-    return userRepository.findAll().stream()
-            .filter(u -> u.getId().equals(id))
-            .findFirst()
+    return userRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("User not found"));
   }
 

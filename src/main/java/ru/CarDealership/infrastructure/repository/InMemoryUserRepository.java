@@ -10,6 +10,11 @@ public class InMemoryUserRepository implements UserRepository {
   private final HashMap<String, User> storage = new HashMap<>();
 
   @Override
+  public Optional<User> findById(UUID id) {
+    return storage.values().stream().filter(u -> u.getId().equals(id)).findFirst();
+  }
+
+  @Override
   public User save(User user) {
     storage.put(user.getEmail(), user);
     return user;

@@ -3,7 +3,6 @@ package ru.CarDealership.service;
 import ru.CarDealership.domain.car.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.CarDealership.domain.car.*;
 import ru.CarDealership.domain.exceptions.EntityNotFoundException;
 
 import java.util.List;
@@ -43,10 +42,7 @@ public class CarService {
   }
 
   public CarConfiguration findConfigurationById(UUID configId) {
-    return carRepository.findAll().stream()
-            .map(Car::getCarConfiguration)
-            .filter(c -> c.getId().equals(configId))
-            .findFirst()
+    return carRepository.findByConfigurationId(configId)
             .orElseThrow(() -> new EntityNotFoundException("Car configuration not found"));
   }
 
@@ -64,19 +60,6 @@ public class CarService {
 
   public List<Car> searchCars(CarFilter filter) {
     filter.validate();
-    return carRepository.findAll().stream()
-        .filter(CarSpecifications.hasBrand(filter.getBrand()))
-        .filter(CarSpecifications.hasModel(filter.getModelName()))
-        .filter(CarSpecifications.hasBodyType(filter.getBodyType()))
-        .filter(CarSpecifications.hasFuelType(filter.getFuelType()))
-        .filter(CarSpecifications.hasDriveType(filter.getDriveType()))
-        .filter(CarSpecifications.hasPriceBetween(filter.getMinPrice(), filter.getMaxPrice()))
-        .filter(CarSpecifications.hasPowerBetween(filter.getMinPower(), filter.getMaxPower()))
-        .filter(
-            CarSpecifications.hasEngineVolumeBetween(
-                filter.getMinEngineVolume(), filter.getMaxEngineVolume()))
-        .filter(CarSpecifications.hasColor(filter.getColor()))
-        .filter(CarSpecifications.hasTransmissionType(filter.getTransmissionType()))
-        .toList();
+    return carRepository.findFiltered(filter);
   }
 }

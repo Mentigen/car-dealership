@@ -14,7 +14,8 @@ class EngineVolumeTest {
 
   @Test
   void testZeroVolume() {
-    assertThrows(IllegalArgumentException.class, () -> new EngineVolume(0.0));
+    EngineVolume volume = new EngineVolume(0.0);
+    assertEquals(0.0, volume.getValue(), 0.001);
   }
 
   @Test

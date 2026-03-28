@@ -7,7 +7,11 @@ import java.util.UUID;
 public interface CarRepository {
   public Optional<Car> findById(UUID id);
 
+  public Optional<CarConfiguration> findByConfigurationId(UUID configId);
+
   public List<Car> findAll();
+
+  public List<Car> findFiltered(CarFilter filter);
 
   public Car save(Car car);
 

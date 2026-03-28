@@ -6,12 +6,14 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.Instant;
 import java.util.UUID;
 
 @MappedSuperclass
 @Getter @Setter
+@SQLRestriction("removed = false")
 public abstract class BaseEntity {
     @Id
     private UUID id;

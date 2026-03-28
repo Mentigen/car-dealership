@@ -1,7 +1,6 @@
 package ru.CarDealership.service;
 
 import ru.CarDealership.domain.car.*;
-import ru.CarDealership.domain.car.*;
 
 import java.math.BigDecimal;
 import java.util.function.Predicate;

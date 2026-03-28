@@ -1,6 +1,6 @@
 --liquibase formatted sql
 
---changeset author:mentigen id:002-seed-users
+--changeset mentigen:002-seed-users
 INSERT INTO users (id, created_at, updated_at, removed, first_name, last_name, email, phone, password_hash, role)
 VALUES
     ('a0000000-0000-0000-0000-000000000001', NOW(), NOW(), FALSE, 'Ivan', 'Petrov', 'manager@dealer.ru', '+79001234567', '$2a$10$dummyhashmanager', 'MANAGER'),
@@ -8,14 +8,14 @@ VALUES
     ('a0000000-0000-0000-0000-000000000003', NOW(), NOW(), FALSE, 'Admin', 'System', 'admin@dealer.ru', '+79009999999', '$2a$10$dummyhashadmin', 'SYSTEM_ADMIN'),
     ('a0000000-0000-0000-0000-000000000004', NOW(), NOW(), FALSE, 'Warehouse', 'Admin', 'warehouse@dealer.ru', '+79008888888', '$2a$10$dummyhashwarehouse', 'WAREHOUSE_ADMIN');
 
---changeset author:mentigen id:002-seed-car-models
+--changeset mentigen:002-seed-car-models
 INSERT INTO car_models (id, created_at, updated_at, removed, brand, model_name, price, engine_power, engine_volume, fuel_type, body, drive)
 VALUES
     ('b0000000-0000-0000-0000-000000000001', NOW(), NOW(), FALSE, 'Toyota', 'Camry', 3500000.00, 200, 2.5, 'PETROL', 'SEDAN', 'FWD'),
     ('b0000000-0000-0000-0000-000000000002', NOW(), NOW(), FALSE, 'BMW', 'X5', 7000000.00, 340, 3.0, 'DIESEL', 'SUV', 'AWD'),
     ('b0000000-0000-0000-0000-000000000003', NOW(), NOW(), FALSE, 'Tesla', 'Model 3', 5000000.00, 283, 0.0, 'ELECTRIC', 'SEDAN', 'RWD');
 
---changeset author:mentigen id:002-seed-parts
+--changeset mentigen:002-seed-parts
 INSERT INTO parts (id, created_at, updated_at, removed, part_kind, type, price, color, transmission_type)
 VALUES
     ('c0000000-0000-0000-0000-000000000001', NOW(), NOW(), FALSE, 'PART', 'WHEEL', 25000.00, NULL, NULL),
@@ -27,7 +27,7 @@ VALUES
     ('c0000000-0000-0000-0000-000000000007', NOW(), NOW(), FALSE, 'TRANSMISSION_PART', 'TRANSMISSION', 60000.00, NULL, 'MANUAL'),
     ('c0000000-0000-0000-0000-000000000008', NOW(), NOW(), FALSE, 'PART', 'WHEEL', 40000.00, NULL, NULL);
 
---changeset author:mentigen id:002-seed-part-compatible-models
+--changeset mentigen:002-seed-part-compatible-models
 INSERT INTO part_compatible_models (part_id, car_model_id)
 VALUES
     ('c0000000-0000-0000-0000-000000000001', 'b0000000-0000-0000-0000-000000000001'),
@@ -46,12 +46,12 @@ VALUES
     ('c0000000-0000-0000-0000-000000000008', 'b0000000-0000-0000-0000-000000000002'),
     ('c0000000-0000-0000-0000-000000000008', 'b0000000-0000-0000-0000-000000000003');
 
---changeset author:mentigen id:002-seed-car-configurations
+--changeset mentigen:002-seed-car-configurations
 INSERT INTO car_configurations (id, created_at, updated_at, removed, car_model_id)
 VALUES
     ('d0000000-0000-0000-0000-000000000001', NOW(), NOW(), FALSE, 'b0000000-0000-0000-0000-000000000001');
 
---changeset author:mentigen id:002-seed-car-configuration-parts
+--changeset mentigen:002-seed-car-configuration-parts
 INSERT INTO car_configuration_parts (car_configuration_id, part_id)
 VALUES
     ('d0000000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000001'),
@@ -60,7 +60,7 @@ VALUES
     ('d0000000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000004'),
     ('d0000000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000005');
 
---changeset author:mentigen id:002-seed-cars
+--changeset mentigen:002-seed-cars
 INSERT INTO cars (id, created_at, updated_at, removed, car_configuration_id, available_for_test_drive)
 VALUES
     ('e0000000-0000-0000-0000-000000000001', NOW(), NOW(), FALSE, 'd0000000-0000-0000-0000-000000000001', TRUE);

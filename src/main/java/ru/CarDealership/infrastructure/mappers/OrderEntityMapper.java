@@ -82,15 +82,29 @@ public class OrderEntityMapper {
 
     private Order createStockOrder(OrderEntity entity) {
         StockOrderEntity stockEntity = (StockOrderEntity) entity;
-        throw new UnsupportedOperationException("Not implemented");
+        return StockOrder.builder()
+                .id(entity.getId())
+                .state(stateFactory.fromString(entity.getStatus()))
+                .client(userMapper.toDomain(entity.getClient()))
+                .manager(userMapper.toDomain(entity.getManager()))
+                .price(entity.getPrice())
+                .car(carMapper.toDomain(stockEntity.getCar()))
+                .build();
     }
 
     private Order createCustomOrder(OrderEntity entity) {
         CustomOrderEntity customEntity = (CustomOrderEntity) entity;
-        throw new UnsupportedOperationException("Not implemented");
+        return CustomOrder.builder()
+                .id(entity.getId())
+                .state(stateFactory.fromString(entity.getStatus()))
+                .client(userMapper.toDomain(entity.getClient()))
+                .manager(userMapper.toDomain(entity.getManager()))
+                .price(entity.getPrice())
+                .carConfiguration(configMapper.toDomain(customEntity.getCarConfiguration()))
+                .build();
     }
 
     private Order createOrder(OrderEntity entity) {
-        throw new IllegalArgumentException("Cannot create generic Order from entity, use subclass");
+        throw new IllegalArgumentException("Cannot map unknown order type: " + entity.getClass());
     }
 }

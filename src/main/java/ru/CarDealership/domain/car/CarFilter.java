@@ -17,8 +17,6 @@ public class CarFilter {
   private FuelType fuelType;
   private Integer minPower;
   private Integer maxPower;
-  private Double minEnginePower;
-  private Double maxEnginePower;
   private Double minEngineVolume;
   private Double maxEngineVolume;
   private TransmissionType transmissionType;

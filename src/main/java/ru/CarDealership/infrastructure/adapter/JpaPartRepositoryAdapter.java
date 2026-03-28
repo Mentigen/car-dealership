@@ -45,6 +45,9 @@ public class JpaPartRepositoryAdapter implements PartRepository {
 
     @Override
     public void delete(UUID id) {
-        jpaRepository.deleteById(id);
+        jpaRepository.findById(id).ifPresent(entity -> {
+            entity.setRemoved(true);
+            jpaRepository.save(entity);
+        });
     }
 }

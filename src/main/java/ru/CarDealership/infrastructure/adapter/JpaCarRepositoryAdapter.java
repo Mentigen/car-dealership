@@ -2,11 +2,14 @@ package ru.CarDealership.infrastructure.adapter;
 
 import org.springframework.stereotype.Component;
 import ru.CarDealership.domain.car.Car;
+import ru.CarDealership.domain.car.CarConfiguration;
+import ru.CarDealership.domain.car.CarFilter;
 import ru.CarDealership.domain.car.CarRepository;
 import ru.CarDealership.infrastructure.entity.CarConfigurationEntity;
 import ru.CarDealership.infrastructure.entity.CarEntity;
 import ru.CarDealership.infrastructure.jpa.CarJpaRepository;
 import ru.CarDealership.infrastructure.mappers.CarEntityMapper;
+import ru.CarDealership.infrastructure.specifications.CarEntitySpecifications;
 
 import java.util.List;
 import java.util.Optional;
@@ -40,6 +43,20 @@ public class JpaCarRepositoryAdapter implements CarRepository {
     }
 
     @Override
+    public Optional<CarConfiguration> findByConfigurationId(UUID configId) {
+        return jpaRepository.findByCarConfiguration_Id(configId)
+                .map(mapper::toDomain)
+                .map(Car::getCarConfiguration);
+    }
+
+    @Override
+    public List<Car> findFiltered(CarFilter filter) {
+        return jpaRepository.findAll(CarEntitySpecifications.fromFilter(filter)).stream()
+                .map(mapper::toDomain)
+                .toList();
+    }
+
+    @Override
     public Car save(Car car) {
         var entity = new CarEntity();
         entity.setId(car.getId());
@@ -51,7 +68,10 @@ public class JpaCarRepositoryAdapter implements CarRepository {
 
     @Override
     public void delete(UUID id) {
-        jpaRepository.deleteById(id);
+        jpaRepository.findById(id).ifPresent(entity -> {
+            entity.setRemoved(true);
+            jpaRepository.save(entity);
+        });
     }
 
     @Override

@@ -1,8 +1,12 @@
 package ru.CarDealership.domain.user;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public interface UserRepository {
+  public Optional<User> findById(UUID id);
+
   public List<User> findAll();
 
   public List<User> findByFirstName(String firstName);

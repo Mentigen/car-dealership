@@ -1,6 +1,6 @@
 --liquibase formatted sql
 
---changeset author:mentigen id:001-create-users
+--changeset mentigen:001-create-users
 CREATE TABLE users (
     id              UUID PRIMARY KEY,
     created_at      TIMESTAMP WITH TIME ZONE,
@@ -14,7 +14,7 @@ CREATE TABLE users (
     role            VARCHAR(50) NOT NULL
 );
 
---changeset author:mentigen id:001-create-car-models
+--changeset mentigen:001-create-car-models
 CREATE TABLE car_models (
     id              UUID PRIMARY KEY,
     created_at      TIMESTAMP WITH TIME ZONE,
@@ -30,7 +30,7 @@ CREATE TABLE car_models (
     drive           VARCHAR(50) NOT NULL
 );
 
---changeset author:mentigen id:001-create-parts
+--changeset mentigen:001-create-parts
 CREATE TABLE parts (
     id                  UUID PRIMARY KEY,
     created_at          TIMESTAMP WITH TIME ZONE,
@@ -43,14 +43,14 @@ CREATE TABLE parts (
     transmission_type   VARCHAR(50)
 );
 
---changeset author:mentigen id:001-create-part-compatible-models
+--changeset mentigen:001-create-part-compatible-models
 CREATE TABLE part_compatible_models (
     part_id         UUID NOT NULL REFERENCES parts(id),
     car_model_id    UUID NOT NULL REFERENCES car_models(id),
     PRIMARY KEY (part_id, car_model_id)
 );
 
---changeset author:mentigen id:001-create-car-configurations
+--changeset mentigen:001-create-car-configurations
 CREATE TABLE car_configurations (
     id              UUID PRIMARY KEY,
     created_at      TIMESTAMP WITH TIME ZONE,
@@ -59,14 +59,14 @@ CREATE TABLE car_configurations (
     car_model_id    UUID NOT NULL REFERENCES car_models(id)
 );
 
---changeset author:mentigen id:001-create-car-configuration-parts
+--changeset mentigen:001-create-car-configuration-parts
 CREATE TABLE car_configuration_parts (
     car_configuration_id    UUID NOT NULL REFERENCES car_configurations(id),
     part_id                 UUID NOT NULL REFERENCES parts(id),
     PRIMARY KEY (car_configuration_id, part_id)
 );
 
---changeset author:mentigen id:001-create-cars
+--changeset mentigen:001-create-cars
 CREATE TABLE cars (
     id                          UUID PRIMARY KEY,
     created_at                  TIMESTAMP WITH TIME ZONE,
@@ -76,7 +76,7 @@ CREATE TABLE cars (
     available_for_test_drive    BOOLEAN NOT NULL DEFAULT FALSE
 );
 
---changeset author:mentigen id:001-create-orders
+--changeset mentigen:001-create-orders
 CREATE TABLE orders (
     id                      UUID PRIMARY KEY,
     created_at              TIMESTAMP WITH TIME ZONE,
@@ -91,7 +91,7 @@ CREATE TABLE orders (
     car_configuration_id    UUID REFERENCES car_configurations(id)
 );
 
---changeset author:mentigen id:001-create-test-drive-requests
+--changeset mentigen:001-create-test-drive-requests
 CREATE TABLE test_drive_requests (
     id              UUID PRIMARY KEY,
     created_at      TIMESTAMP WITH TIME ZONE,

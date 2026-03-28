@@ -8,6 +8,8 @@ import ru.CarDealership.infrastructure.jpa.UserJpaRepository;
 import ru.CarDealership.infrastructure.mappers.UserEntityMapper;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Component
 public class JpaUserRepositoryAdapter implements UserRepository {
@@ -21,6 +23,12 @@ public class JpaUserRepositoryAdapter implements UserRepository {
     }
 
     @Override
+    public Optional<User> findById(UUID id) {
+        return jpaRepository.findById(id)
+                .map(mapper::toDomain);
+    }
+
+    @Override
     public List<User> findAll() {
         return jpaRepository.findAll().stream()
                 .map(mapper::toDomain)
@@ -29,16 +37,14 @@ public class JpaUserRepositoryAdapter implements UserRepository {
 
     @Override
     public List<User> findByFirstName(String firstName) {
-        return jpaRepository.findAll().stream()
-                .filter(e -> e.getFirstName().equals(firstName))
+        return jpaRepository.findByFirstName(firstName).stream()
                 .map(mapper::toDomain)
                 .toList();
     }
 
     @Override
     public List<User> findByLastName(String lastName) {
-        return jpaRepository.findAll().stream()
-                .filter(e -> e.getLastName().equals(lastName))
+        return jpaRepository.findByLastName(lastName).stream()
                 .map(mapper::toDomain)
                 .toList();
     }
@@ -52,8 +58,7 @@ public class JpaUserRepositoryAdapter implements UserRepository {
 
     @Override
     public List<User> findByName(String firstName, String lastName) {
-        return jpaRepository.findAll().stream()
-                .filter(e -> e.getFirstName().equals(firstName) && e.getLastName().equals(lastName))
+        return jpaRepository.findByFirstNameAndLastName(firstName, lastName).stream()
                 .map(mapper::toDomain)
                 .toList();
     }
@@ -67,8 +72,7 @@ public class JpaUserRepositoryAdapter implements UserRepository {
 
     @Override
     public List<User> findByPhone(String phone) {
-        return jpaRepository.findAll().stream()
-                .filter(e -> phone.equals(e.getPhone()))
+        return jpaRepository.findByPhone(phone).stream()
                 .map(mapper::toDomain)
                 .toList();
     }
@@ -81,7 +85,9 @@ public class JpaUserRepositoryAdapter implements UserRepository {
 
     @Override
     public void delete(String email) {
-        jpaRepository.findByEmail(email).stream()
-                .forEach(e -> jpaRepository.delete(e));
+        jpaRepository.findByEmail(email).forEach(entity -> {
+            entity.setRemoved(true);
+            jpaRepository.save(entity);
+        });
     }
 }

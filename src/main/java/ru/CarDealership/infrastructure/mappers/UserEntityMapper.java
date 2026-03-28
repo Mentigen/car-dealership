@@ -1,6 +1,5 @@
 package ru.CarDealership.infrastructure.mappers;
 
-import lombok.extern.apachecommons.CommonsLog;
 import org.springframework.stereotype.Component;
 import ru.CarDealership.domain.user.User;
 import ru.CarDealership.infrastructure.entity.UserEntity;

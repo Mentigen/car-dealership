@@ -18,7 +18,14 @@ repositories {
     mavenCentral()
 }
 
+dependencyManagement {
+    imports {
+        mavenBom "org.testcontainers:testcontainers-bom:1.20.6"
+    }
+}
+
 dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
     testImplementation 'org.testcontainers:postgresql'
     testImplementation 'org.testcontainers:junit-jupiter'
     compileOnly 'org.projectlombok:lombok:1.18.30'
@@ -64,6 +71,7 @@ tasks.register('integrationTest', Test) {
     classpath = sourceSets.integrationTest.runtimeClasspath
     useJUnitPlatform()
     shouldRunAfter test
+    jvmArgs '-Dapi.version=1.43', '-Ddocker.host=unix:///var/run/docker.sock'
     testLogging {
         events 'passed', 'skipped', 'failed'
     }
