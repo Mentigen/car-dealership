@@ -2,7 +2,7 @@ package ru.CarDealership.domain.user;
 
 public enum Role {
   MANAGER,
-  CUSTOMER,
-  SYSTEM_ADMIN,
+  USER,
+  ADMIN,
   WAREHOUSE_ADMIN,
 }
