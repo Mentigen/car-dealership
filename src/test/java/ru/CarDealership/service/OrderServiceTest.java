@@ -48,7 +48,7 @@ class OrderServiceTest {
             UUID.randomUUID(),
             "Ivan",
             "Ivanov",
-            Role.CUSTOMER,
+            Role.USER,
             "ivan@ya.ru",
             "88005553535",
             "ivan228");

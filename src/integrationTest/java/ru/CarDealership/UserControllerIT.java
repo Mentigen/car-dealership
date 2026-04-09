@@ -3,6 +3,7 @@ package ru.CarDealership;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import ru.CarDealership.api.dto.UserRegisterRequest;
@@ -20,8 +21,11 @@ class UserControllerIT extends BaseIntegrationTest {
 
     @Test
     void getAllUsers_returnsSeededUsers() {
-        ResponseEntity<UserResponse[]> response =
-                restTemplate.getForEntity("/api/users", UserResponse[].class);
+        ResponseEntity<UserResponse[]> response = restTemplate.exchange(
+                "/api/users", HttpMethod.GET,
+                authRequest("manager-token"),
+                UserResponse[].class
+        );
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
@@ -29,9 +33,28 @@ class UserControllerIT extends BaseIntegrationTest {
     }
 
     @Test
+    void getAllUsers_withoutToken_returns401() {
+        ResponseEntity<String> response = restTemplate.getForEntity("/api/users", String.class);
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+    }
+
+    @Test
+    void getAllUsers_withUserRole_returns403() {
+        ResponseEntity<String> response = restTemplate.exchange(
+                "/api/users", HttpMethod.GET,
+                authRequest("customer-token"),
+                String.class
+        );
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+    }
+
+    @Test
     void getUsersByRole_filtersCorrectly() {
-        ResponseEntity<UserResponse[]> response =
-                restTemplate.getForEntity("/api/users/by-role?role=MANAGER", UserResponse[].class);
+        ResponseEntity<UserResponse[]> response = restTemplate.exchange(
+                "/api/users/by-role?role=MANAGER", HttpMethod.GET,
+                authRequest("manager-token"),
+                UserResponse[].class
+        );
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
@@ -47,13 +70,34 @@ class UserControllerIT extends BaseIntegrationTest {
         request.setLastName("User");
         request.setEmail("new_" + UUID.randomUUID() + "@test.ru");
         request.setPassword("password123");
-        request.setRole(Role.CUSTOMER);
+        request.setRole(Role.USER);
 
-        ResponseEntity<UserResponse> response =
-                restTemplate.postForEntity("/api/users", request, UserResponse.class);
+        ResponseEntity<UserResponse> response = restTemplate.exchange(
+                "/api/users", HttpMethod.POST,
+                authRequest(request, "admin-token"),
+                UserResponse.class
+        );
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals("New", response.getBody().firstName());
+    }
+
+    @Test
+    void registerUser_withManagerRole_returns403() {
+        UserRegisterRequest request = new UserRegisterRequest();
+        request.setFirstName("Test");
+        request.setLastName("User");
+        request.setEmail("blocked_" + UUID.randomUUID() + "@test.ru");
+        request.setPassword("password123");
+        request.setRole(Role.USER);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                "/api/users", HttpMethod.POST,
+                authRequest(request, "manager-token"),
+                String.class
+        );
+
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
 }

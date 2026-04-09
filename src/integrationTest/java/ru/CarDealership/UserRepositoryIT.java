@@ -33,7 +33,7 @@ class UserRepositoryIT extends BaseIntegrationTest {
     @Test
     void saveAndFind_worksCorrectly() {
         User user = new User(
-                UUID.randomUUID(), "Test", "User", Role.CUSTOMER,
+                UUID.randomUUID(), "Test", "User", Role.USER,
                 "test_" + UUID.randomUUID() + "@test.ru", "+70001112233", "hash123"
         );
 

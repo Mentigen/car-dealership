@@ -23,13 +23,13 @@ class UserServiceTest {
     userService = new UserService(userRepository);
 
     user =
-        new User(UUID.randomUUID(), "Ivan", "Ivanov", Role.CUSTOMER, "ivan@ya.ru", "123", "pass");
+        new User(UUID.randomUUID(), "Ivan", "Ivanov", Role.USER, "ivan@ya.ru", "123", "pass");
   }
 
   @Test
   void testRegisterUser() {
     User registered =
-        userService.register("ivan@ya.ru", "pass", "Ivan", "Ivanov", "123", Role.CUSTOMER);
+        userService.register("ivan@ya.ru", "pass", "Ivan", "Ivanov", "123", Role.USER);
 
     assertNotNull(registered);
     assertEquals("Ivan", registered.getFirstName());
@@ -41,7 +41,7 @@ class UserServiceTest {
 
   @Test
   void testFindUserByEmail() {
-    userService.register("ivan@ya.ru", "pass", "Ivan", "Ivanov", "123", Role.CUSTOMER);
+    userService.register("ivan@ya.ru", "pass", "Ivan", "Ivanov", "123", Role.USER);
 
     List<User> found = userService.findByEmail("ivan@ya.ru");
     assertEquals(1, found.size());
@@ -50,10 +50,10 @@ class UserServiceTest {
 
   @Test
   void testFindUserByRole() {
-    userService.register("ivan@ya.ru", "pass", "Ivan", "Ivanov", "123", Role.CUSTOMER);
+    userService.register("ivan@ya.ru", "pass", "Ivan", "Ivanov", "123", Role.USER);
     userService.register("petr@ya.ru", "pass", "Petr", "Petrov", "456", Role.MANAGER);
 
-    List<User> customers = userService.findByRole(Role.CUSTOMER);
+    List<User> customers = userService.findByRole(Role.USER);
     List<User> managers = userService.findByRole(Role.MANAGER);
 
     assertEquals(1, customers.size());
@@ -62,7 +62,7 @@ class UserServiceTest {
 
   @Test
   void testFindAll() {
-    userService.register("ivan@ya.ru", "pass", "Ivan", "Ivanov", "123", Role.CUSTOMER);
+    userService.register("ivan@ya.ru", "pass", "Ivan", "Ivanov", "123", Role.USER);
     assertFalse(userService.findAll().isEmpty());
   }
 }

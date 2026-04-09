@@ -31,7 +31,7 @@ class TestDriveServiceTest {
     testDriveService = new TestDriveService(carRepository, requestRepository);
 
     client =
-        new User(UUID.randomUUID(), "Ivan", "Ivanov", Role.CUSTOMER, "ivan@ya.ru", "123", "pass");
+        new User(UUID.randomUUID(), "Ivan", "Ivanov", Role.USER, "ivan@ya.ru", "123", "pass");
 
     CarModel model = new CarModel();
     model.setId(UUID.randomUUID());
