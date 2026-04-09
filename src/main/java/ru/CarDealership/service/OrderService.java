@@ -48,6 +48,14 @@ public class OrderService {
     return orderRepository.findByCustomer(customer);
   }
 
+  @Transactional(readOnly = true)
+  public List<Order> findOrdersVisibleTo(User user, boolean privileged) {
+    if (privileged) {
+      return orderRepository.findAll();
+    }
+    return orderRepository.findByCustomer(user);
+  }
+
   public StockOrder createStockOrder(User client, Car car) {
     List<User> managers = userRepository.findByRole(Role.MANAGER);
     if (managers.isEmpty()) throw new IllegalStateException("No managers available");
