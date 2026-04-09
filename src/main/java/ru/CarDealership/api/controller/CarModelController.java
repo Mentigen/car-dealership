@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.CarDealership.api.dto.CarModelRequest;
 import ru.CarDealership.api.dto.CarModelResponse;
@@ -41,6 +42,7 @@ public class CarModelController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create car model")
+    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
     public CarModelResponse create(@Valid @RequestBody CarModelRequest request) {
         CarModel model = new CarModel(
                 null,
@@ -59,6 +61,7 @@ public class CarModelController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete car model")
+    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
     public void delete(@PathVariable UUID id) {
         carModelService.delete(id);
     }

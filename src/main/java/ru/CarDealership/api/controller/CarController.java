@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.CarDealership.api.dto.ApiResponse;
 import ru.CarDealership.api.dto.CarFilterRequest;
@@ -68,6 +69,7 @@ public class CarController {
     @PostMapping("/{id}/test-drive")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Add car to test drive fleet")
+    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
     @ApiResponses({
         @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "204", description = "Car added to test drive"),
         @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Invalid car ID format"),
@@ -81,6 +83,7 @@ public class CarController {
     @DeleteMapping("/{id}/test-drive")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Remove car from test drive fleet")
+    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
     @ApiResponses({
         @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "204", description = "Car removed from test drive"),
         @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Invalid car ID format"),

@@ -8,7 +8,5 @@ import java.util.UUID;
 @Data
 public class CreateCustomOrderRequest {
     @NotNull
-    private UUID clientId;
-    @NotNull
     private UUID carConfigurationId;
 }

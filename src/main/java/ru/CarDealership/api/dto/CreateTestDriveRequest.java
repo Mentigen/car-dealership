@@ -10,8 +10,6 @@ import java.util.UUID;
 @Data
 public class CreateTestDriveRequest {
     @NotNull
-    private UUID clientId;
-    @NotNull
     private UUID carId;
     @NotNull @Future
     private LocalDateTime startTime;
