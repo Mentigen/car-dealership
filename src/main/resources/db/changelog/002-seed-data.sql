@@ -1,6 +1,7 @@
 --liquibase formatted sql
 
 --changeset mentigen:002-seed-users
+--validCheckSum 9:e38b544fe3001e7dee3d7a7b52b99780
 INSERT INTO users (id, created_at, updated_at, removed, first_name, last_name, email, phone, password_hash, role)
 VALUES
     ('a0000000-0000-0000-0000-000000000001', NOW(), NOW(), FALSE, 'Ivan', 'Petrov', 'manager@dealer.ru', '+79001234567', '$2a$10$dummyhashmanager', 'MANAGER'),
