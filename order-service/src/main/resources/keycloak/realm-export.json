@@ -1,0 +1,84 @@
+{
+  "realm": "cardealership",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": false,
+  "editUsernameAllowed": false,
+  "bruteForceProtected": false,
+  "roles": {
+    "realm": [
+      { "name": "USER", "composite": false },
+      { "name": "MANAGER", "composite": false },
+      { "name": "WAREHOUSE_ADMIN", "composite": false },
+      { "name": "ADMIN", "composite": false }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "cardealership-api",
+      "enabled": true,
+      "publicClient": true,
+      "directAccessGrantsEnabled": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "serviceAccountsEnabled": false,
+      "redirectUris": ["http://localhost:8080/*"],
+      "webOrigins": ["http://localhost:8080"],
+      "defaultClientScopes": ["web-origins", "acr", "roles", "profile", "email"],
+      "optionalClientScopes": ["address", "phone", "offline_access"]
+    }
+  ],
+  "users": [
+    {
+      "username": "manager",
+      "email": "manager@dealer.ru",
+      "firstName": "Ivan",
+      "lastName": "Petrov",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        { "type": "password", "value": "password", "temporary": false }
+      ],
+      "realmRoles": ["MANAGER"]
+    },
+    {
+      "username": "customer",
+      "email": "customer@mail.ru",
+      "firstName": "Anna",
+      "lastName": "Sidorova",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        { "type": "password", "value": "password", "temporary": false }
+      ],
+      "realmRoles": ["USER"]
+    },
+    {
+      "username": "admin",
+      "email": "admin@dealer.ru",
+      "firstName": "Admin",
+      "lastName": "System",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        { "type": "password", "value": "password", "temporary": false }
+      ],
+      "realmRoles": ["ADMIN"]
+    },
+    {
+      "username": "warehouse",
+      "email": "warehouse@dealer.ru",
+      "firstName": "Warehouse",
+      "lastName": "Admin",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        { "type": "password", "value": "password", "temporary": false }
+      ],
+      "realmRoles": ["WAREHOUSE_ADMIN"]
+    }
+  ]
+}

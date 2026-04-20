@@ -1,26 +1,54 @@
 version: '3.8'
 
 services:
-  postgres:
+  postgres-orders:
     image: postgres:16-alpine
-    container_name: cardealership-postgres
-
+    container_name: cardealership-postgres-orders
     environment:
-      POSTGRES_DB: cardealership
+      POSTGRES_DB: orderservice
       POSTGRES_USER: cardealership
       POSTGRES_PASSWORD: cardealership
-
     ports:
       - "5432:5432"
-
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-
+      - postgres_orders_data:/var/lib/postgresql/data
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U cardealership" ]
       interval: 10s
       timeout: 5s
       retries: 5
+
+  postgres-storage:
+    image: postgres:16-alpine
+    container_name: cardealership-postgres-storage
+    environment:
+      POSTGRES_DB: storageservice
+      POSTGRES_USER: cardealership
+      POSTGRES_PASSWORD: cardealership
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_storage_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U cardealership" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: cardealership-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "check_port_connectivity" ]
+      interval: 15s
+      timeout: 10s
+      retries: 10
 
   keycloak:
     image: quay.io/keycloak/keycloak:24.0
@@ -32,12 +60,56 @@ services:
     ports:
       - "8180:8080"
     volumes:
-      - ./src/main/resources/keycloak:/opt/keycloak/data/import
+      - ./order-service/src/main/resources/keycloak:/opt/keycloak/data/import
     healthcheck:
       test: [ "CMD-SHELL", "curl -sf http://localhost:8080/health/ready || exit 1" ]
       interval: 15s
       timeout: 5s
       retries: 10
 
+  order-service:
+    build:
+      context: ./order-service
+      dockerfile: docker/Dockerfile
+    container_name: cardealership-order-service
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-orders:5432/orderservice
+      SPRING_DATASOURCE_USERNAME: cardealership
+      SPRING_DATASOURCE_PASSWORD: cardealership
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8080/realms/cardealership
+      STORAGE_SERVICE_URL: http://storage-service:8081
+    depends_on:
+      postgres-orders:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+
+  storage-service:
+    build:
+      context: ./storage-service
+      dockerfile: docker/Dockerfile
+    container_name: cardealership-storage-service
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-storage:5432/storageservice
+      SPRING_DATASOURCE_USERNAME: cardealership
+      SPRING_DATASOURCE_PASSWORD: cardealership
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8080/realms/cardealership
+    depends_on:
+      postgres-storage:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+
 volumes:
-  postgres_data:
+  postgres_orders_data:
+  postgres_storage_data:
