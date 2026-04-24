@@ -10,7 +10,7 @@ public class PaidState implements OrderState {
 
     @Override
     public void cancel(Order context) {
-        throw new IllegalStateException("Cannot cancel on this step");
+        context.changeState(new CancelledState());
     }
 
     @Override

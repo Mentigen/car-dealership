@@ -62,7 +62,7 @@ services:
     volumes:
       - ./order-service/src/main/resources/keycloak:/opt/keycloak/data/import
     healthcheck:
-      test: [ "CMD-SHELL", "curl -sf http://localhost:8080/health/ready || exit 1" ]
+      test: [ "CMD-SHELL", "exec 3<>/dev/tcp/localhost/8080 && echo ok || exit 1" ]
       interval: 15s
       timeout: 5s
       retries: 10
@@ -79,7 +79,7 @@ services:
       SPRING_DATASOURCE_USERNAME: cardealership
       SPRING_DATASOURCE_PASSWORD: cardealership
       SPRING_RABBITMQ_HOST: rabbitmq
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8080/realms/cardealership
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8080/realms/cardealership/protocol/openid-connect/certs
       STORAGE_SERVICE_URL: http://storage-service:8081
     depends_on:
       postgres-orders:
@@ -101,7 +101,7 @@ services:
       SPRING_DATASOURCE_USERNAME: cardealership
       SPRING_DATASOURCE_PASSWORD: cardealership
       SPRING_RABBITMQ_HOST: rabbitmq
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8080/realms/cardealership
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8080/realms/cardealership/protocol/openid-connect/certs
     depends_on:
       postgres-storage:
         condition: service_healthy
