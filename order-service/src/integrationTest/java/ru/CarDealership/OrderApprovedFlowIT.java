@@ -50,7 +50,7 @@ class OrderApprovedFlowIT extends BaseIntegrationTest {
         orderService.nextStep(order.getId());
         orderService.nextStep(order.getId());
 
-        List<OutboxEvent> pending = outboxEventRepository.findBySentFalse();
+        List<OutboxEvent> pending = outboxEventRepository.findBySentFalseForUpdate(100);
         assertThat(pending).hasSize(1);
         assertThat(pending.get(0).getOrderId()).isEqualTo(order.getId());
 

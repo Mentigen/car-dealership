@@ -44,7 +44,7 @@ CREATE TABLE test_drive_requests (
 --changeset mentigen:001-create-outbox-events
 CREATE TABLE outbox_events (
     id                      UUID PRIMARY KEY,
-    order_id                UUID NOT NULL,
+    order_id                UUID NOT NULL UNIQUE,
     order_type              VARCHAR(31) NOT NULL,
     car_id                  UUID,
     car_configuration_id    UUID,

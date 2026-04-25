@@ -25,7 +25,7 @@ public class OutboxPublisher {
     @Scheduled(fixedDelay = 5000)
     @Transactional
     public void publishPendingEvents() {
-        List<OutboxEvent> events = outboxEventRepository.findBySentFalse();
+        List<OutboxEvent> events = outboxEventRepository.findBySentFalseForUpdate(100);
         for (OutboxEvent event : events) {
             try {
                 OrderSentForApprovalEvent message = new OrderSentForApprovalEvent(
