@@ -1,0 +1,33 @@
+syntax = "proto3";
+package car;
+
+option java_package = "ru.CarDealership.grpc";
+option java_outer_classname = "CarServiceProto";
+option java_multiple_files = true;
+
+service CarGrpcService {
+    rpc GetAvailableCars(GetAvailableCarsRequest) returns (GetAvailableCarsResponse);
+    rpc GetCarById(GetCarByIdRequest) returns (CarProto);
+}
+
+message GetAvailableCarsRequest {}
+
+message GetAvailableCarsResponse {
+    repeated CarProto cars = 1;
+}
+
+message GetCarByIdRequest {
+    string id = 1;
+}
+
+message CarProto {
+    string id = 1;
+    string brand = 2;
+    string model_name = 3;
+    double price = 4;
+    string body_type = 5;
+    string fuel_type = 6;
+    string drive_type = 7;
+    int32 engine_power = 8;
+    double engine_volume = 9;
+}
