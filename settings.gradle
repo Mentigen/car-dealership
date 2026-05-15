@@ -1,3 +1,10 @@
+pluginManagement {
+    repositories {
+        maven { url 'https://plugins.gradle.org/m2/' }
+        mavenCentral()
+    }
+}
+
 rootProject.name = 'java-template'
 include 'order-service'
 include 'storage-service'
