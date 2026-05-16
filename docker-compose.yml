@@ -81,6 +81,8 @@ services:
       SPRING_RABBITMQ_HOST: rabbitmq
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8080/realms/cardealership/protocol/openid-connect/certs
       STORAGE_SERVICE_URL: http://storage-service:8081
+      GRPC_CLIENT_STORAGE_SERVICE_ADDRESS: static://storage-service:9091
+      GRPC_CLIENT_STORAGE_SERVICE_NEGOTIATION_TYPE: plaintext
     depends_on:
       postgres-orders:
         condition: service_healthy
@@ -96,6 +98,7 @@ services:
     container_name: cardealership-storage-service
     ports:
       - "8081:8081"
+      - "9091:9091"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-storage:5432/storageservice
       SPRING_DATASOURCE_USERNAME: cardealership
