@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.CarDealership.domain.exceptions.DomainValidationException;
 import ru.CarDealership.domain.exceptions.EntityNotFoundException;
+import ru.CarDealership.domain.exceptions.ServiceUnavailableException;
 
 import java.time.Instant;
 
@@ -30,6 +31,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleIllegalState(IllegalStateException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(new ErrorResponse(409, "Conflict", ex.getMessage(), Instant.now()));
+    }
+
+    @ExceptionHandler(ServiceUnavailableException.class)
+    public ResponseEntity<ErrorResponse> handleServiceUnavailable(ServiceUnavailableException ex) {
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(new ErrorResponse(503, "Service Unavailable", ex.getMessage(), Instant.now()));
     }
 
     @ExceptionHandler(AccessDeniedException.class)

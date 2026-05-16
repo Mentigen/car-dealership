@@ -32,3 +32,10 @@ springdoc:
 
 server:
   port: 8080
+
+grpc:
+  client:
+    storage-service:
+      address: static://localhost:9091
+      negotiation-type: plaintext
+      deadline: 5000
