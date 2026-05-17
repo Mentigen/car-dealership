@@ -143,6 +143,31 @@ class CarGrpcClientIT extends BaseIntegrationTest {
         }
     }
 
+    @Test
+    void getAvailableCars_emptyResponse_returnsEmptyList() throws Exception {
+        Server emptyServer = InProcessServerBuilder.forName("empty-server")
+                .directExecutor()
+                .addService(new EmptyCarService())
+                .build()
+                .start();
+        try {
+            ManagedChannel channel = InProcessChannelBuilder.forName("empty-server")
+                    .directExecutor()
+                    .build();
+            try {
+                GrpcCarClient testClient = new GrpcCarClient();
+                ReflectionTestUtils.setField(testClient, "stub",
+                        CarGrpcServiceGrpc.newBlockingStub(channel));
+                List<CarResponse> cars = testClient.getAvailableCars();
+                assertThat(cars).isEmpty();
+            } finally {
+                channel.shutdown().awaitTermination(2, TimeUnit.SECONDS);
+            }
+        } finally {
+            emptyServer.shutdown().awaitTermination(2, TimeUnit.SECONDS);
+        }
+    }
+
     static class FakeCarService extends CarGrpcServiceGrpc.CarGrpcServiceImplBase {
 
         @Override
@@ -187,6 +212,15 @@ class CarGrpcClientIT extends BaseIntegrationTest {
                 responseObserver.onError(Status.CANCELLED.asRuntimeException());
                 return;
             }
+            responseObserver.onNext(GetAvailableCarsResponse.newBuilder().build());
+            responseObserver.onCompleted();
+        }
+    }
+
+    static class EmptyCarService extends CarGrpcServiceGrpc.CarGrpcServiceImplBase {
+        @Override
+        public void getAvailableCars(GetAvailableCarsRequest request,
+                                     StreamObserver<GetAvailableCarsResponse> responseObserver) {
             responseObserver.onNext(GetAvailableCarsResponse.newBuilder().build());
             responseObserver.onCompleted();
         }
