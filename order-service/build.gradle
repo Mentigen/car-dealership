@@ -43,3 +43,5 @@ protobuf {
         }
     }
 }
+
+integrationTest.dependsOn(':storage-service:bootJar')

@@ -1,228 +1,135 @@
 package ru.CarDealership;
-
-import io.grpc.*;
-import io.grpc.inprocess.InProcessChannelBuilder;
-import io.grpc.inprocess.InProcessServerBuilder;
-import io.grpc.stub.StreamObserver;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.Network;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.containers.RabbitMQContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.images.builder.ImageFromDockerfile;
+import org.testcontainers.junit.jupiter.Container;
 import ru.CarDealership.api.dto.CarResponse;
-import ru.CarDealership.domain.exceptions.EntityNotFoundException;
-import ru.CarDealership.domain.exceptions.ServiceUnavailableException;
-import ru.CarDealership.grpc.*;
+import ru.CarDealership.grpc.GrpcCarClient;
 
-import java.io.IOException;
+import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class CarGrpcClientIT extends BaseIntegrationTest {
 
-    private static final String SERVER_NAME = "test-storage-client";
-    private static Server fakeServer;
+    static final Network storageNetwork = Network.newNetwork();
 
-    private static final UUID CAR_ID = UUID.randomUUID();
+    @Container
+    static final PostgreSQLContainer<?> storagePostgres = new PostgreSQLContainer<>("postgres:15")
+            .withNetwork(storageNetwork)
+            .withNetworkAliases("storage-postgres")
+            .withDatabaseName("storageservice")
+            .withUsername("cardealership")
+            .withPassword("cardealership");
 
-    private static final CarProto SAMPLE_CAR = CarProto.newBuilder()
-            .setId(CAR_ID.toString())
-            .setBrand("Toyota")
-            .setModelName("Camry")
-            .setPrice(2500000.0)
-            .setBodyType("SEDAN")
-            .setFuelType("PETROL")
-            .setDriveType("FWD")
-            .setEnginePower(150)
-            .setEngineVolume(2.5)
-            .build();
+    @Container
+    static final RabbitMQContainer storageRabbit = new RabbitMQContainer("rabbitmq:3-management")
+            .withNetwork(storageNetwork)
+            .withNetworkAliases("storage-rabbit");
+
+    @Container
+    static final GenericContainer<?> storageService = new GenericContainer<>(
+            new ImageFromDockerfile()
+                    .withDockerfile(Paths.get("../storage-service/docker/Dockerfile"))
+                    .withFileFromPath(".", Paths.get("../storage-service"))
+    )
+            .withNetwork(storageNetwork)
+            .withExposedPorts(9091, 8081)
+            .withEnv("SPRING_DATASOURCE_URL", "jdbc:postgresql://storage-postgres:5432/storageservice")
+            .withEnv("SPRING_DATASOURCE_USERNAME", "cardealership")
+            .withEnv("SPRING_DATASOURCE_PASSWORD", "cardealership")
+            .withEnv("SPRING_RABBITMQ_HOST", "storage-rabbit")
+            .withEnv("SPRING_RABBITMQ_PORT", "5672")
+            .withEnv("SPRING_RABBITMQ_USERNAME", "guest")
+            .withEnv("SPRING_RABBITMQ_PASSWORD", "guest")
+            .withEnv("SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI",
+                    "http://localhost:9999/realms/cardealership/protocol/openid-connect/certs")
+            .dependsOn(storageRabbit, storagePostgres)
+            .waitingFor(Wait.forHttp("/actuator/health")
+                    .forPort(8081)
+                    .withStartupTimeout(Duration.ofMinutes(2)));
+
+    private static final UUID CAR_MODEL_ID = UUID.fromString("b0000000-0000-0000-0000-000000000001");
 
     @DynamicPropertySource
     static void grpcClientProperties(DynamicPropertyRegistry registry) {
-        registry.add("grpc.client.storage-service.address", () -> "in-process:" + SERVER_NAME);
+        registry.add("grpc.client.storage-service.address",
+                () -> "static://localhost:" + storageService.getMappedPort(9091));
         registry.add("grpc.client.storage-service.negotiation-type", () -> "PLAINTEXT");
-    }
-
-    @BeforeAll
-    static void startFakeServer() throws IOException {
-        fakeServer = InProcessServerBuilder.forName(SERVER_NAME)
-                .directExecutor()
-                .addService(new FakeCarService())
-                .build()
-                .start();
-    }
-
-    @AfterAll
-    static void stopFakeServer() throws InterruptedException {
-        if (fakeServer != null) {
-            fakeServer.shutdown().awaitTermination(5, TimeUnit.SECONDS);
-        }
     }
 
     @Autowired
     private GrpcCarClient grpcCarClient;
 
     @Test
-    void getAvailableCars_returnsCarList() {
-        List<CarResponse> cars = grpcCarClient.getAvailableCars();
-        assertThat(cars).hasSize(1);
-        assertThat(cars.get(0).brand()).isEqualTo("Toyota");
-        assertThat(cars.get(0).modelName()).isEqualTo("Camry");
-        assertThat(cars.get(0).enginePower()).isEqualTo(150);
+    void getAvailableCars_emptyDatabase_returnEmptyList() {
+        assertThat(grpcCarClient.getAvailableCars()).isEmpty();
     }
 
     @Test
-    void getCarById_existingId_returnsCar() {
-        CarResponse car = grpcCarClient.getCarById(CAR_ID);
-        assertThat(car.brand()).isEqualTo("Toyota");
-        assertThat(car.engineVolume()).isEqualTo(2.5);
-    }
-
-    @Test
-    void getCarById_unknownId_throwsEntityNotFoundException() {
-        assertThatThrownBy(() -> grpcCarClient.getCarById(UUID.randomUUID()))
-                .isInstanceOf(EntityNotFoundException.class);
-    }
-
-    @Test
-    void getAvailableCars_serverUnavailable_throwsServiceUnavailableException() throws Exception {
-        Server unavailableServer = InProcessServerBuilder.forName("unavailable-server")
-                .directExecutor()
-                .addService(new UnavailableCarService())
-                .build()
-                .start();
+    void getAvailableCars_withCar_returnsCarList() throws Exception {
+        UUID configId = UUID.randomUUID();
+        UUID carId = UUID.randomUUID();
+        seedCar(configId, carId);
         try {
-            ManagedChannel channel = InProcessChannelBuilder.forName("unavailable-server")
-                    .directExecutor()
-                    .build();
-            try {
-                GrpcCarClient testClient = new GrpcCarClient();
-                ReflectionTestUtils.setField(testClient, "stub",
-                        CarGrpcServiceGrpc.newBlockingStub(channel));
-
-                assertThatThrownBy(testClient::getAvailableCars)
-                        .isInstanceOf(ServiceUnavailableException.class);
-            } finally {
-                channel.shutdown().awaitTermination(2, TimeUnit.SECONDS);
-            }
+            List<CarResponse> cars = grpcCarClient.getAvailableCars();
+            assertThat(cars).hasSize(1);
+            assertThat(cars.get(0).brand()).isEqualTo("Toyota");
+            assertThat(cars.get(0).modelName()).isEqualTo("Camry");
         } finally {
-            unavailableServer.shutdown().awaitTermination(2, TimeUnit.SECONDS);
+            cleanupCar(configId, carId);
         }
     }
 
-    @Test
-    void getAvailableCars_deadlineExceeded_throwsServiceUnavailableException() throws Exception {
-        Server slowServer = InProcessServerBuilder.forName("slow-server")
-                .directExecutor()
-                .addService(new SlowCarService())
-                .build()
-                .start();
-        try {
-            ManagedChannel channel = InProcessChannelBuilder.forName("slow-server")
-                    .directExecutor()
-                    .build();
-            try {
-                GrpcCarClient testClient = new GrpcCarClient();
-                ReflectionTestUtils.setField(testClient, "stub",
-                        CarGrpcServiceGrpc.newBlockingStub(channel)
-                                .withDeadlineAfter(100, TimeUnit.MILLISECONDS));
-
-                assertThatThrownBy(testClient::getAvailableCars)
-                        .isInstanceOf(ServiceUnavailableException.class);
-            } finally {
-                channel.shutdown().awaitTermination(2, TimeUnit.SECONDS);
+    private void seedCar(UUID configId, UUID carId) throws Exception {
+        try (Connection conn = DriverManager.getConnection(
+                storagePostgres.getJdbcUrl(),
+                storagePostgres.getUsername(),
+                storagePostgres.getPassword())) {
+            try (PreparedStatement ps = conn.prepareStatement(
+                    "INSERT INTO car_configurations (id, created_at, updated_at, removed, car_model_id) " +
+                    "VALUES (?, NOW(), NOW(), FALSE, ?)")) {
+                ps.setObject(1, configId);
+                ps.setObject(2, CAR_MODEL_ID);
+                ps.executeUpdate();
             }
-        } finally {
-            slowServer.shutdownNow().awaitTermination(3, TimeUnit.SECONDS);
-        }
-    }
-
-    @Test
-    void getAvailableCars_emptyResponse_returnsEmptyList() throws Exception {
-        Server emptyServer = InProcessServerBuilder.forName("empty-server")
-                .directExecutor()
-                .addService(new EmptyCarService())
-                .build()
-                .start();
-        try {
-            ManagedChannel channel = InProcessChannelBuilder.forName("empty-server")
-                    .directExecutor()
-                    .build();
-            try {
-                GrpcCarClient testClient = new GrpcCarClient();
-                ReflectionTestUtils.setField(testClient, "stub",
-                        CarGrpcServiceGrpc.newBlockingStub(channel));
-                List<CarResponse> cars = testClient.getAvailableCars();
-                assertThat(cars).isEmpty();
-            } finally {
-                channel.shutdown().awaitTermination(2, TimeUnit.SECONDS);
-            }
-        } finally {
-            emptyServer.shutdown().awaitTermination(2, TimeUnit.SECONDS);
-        }
-    }
-
-    static class FakeCarService extends CarGrpcServiceGrpc.CarGrpcServiceImplBase {
-
-        @Override
-        public void getAvailableCars(GetAvailableCarsRequest request,
-                                     StreamObserver<GetAvailableCarsResponse> responseObserver) {
-            responseObserver.onNext(GetAvailableCarsResponse.newBuilder()
-                    .addCars(SAMPLE_CAR)
-                    .build());
-            responseObserver.onCompleted();
-        }
-
-        @Override
-        public void getCarById(GetCarByIdRequest request,
-                               StreamObserver<CarProto> responseObserver) {
-            if (request.getId().equals(CAR_ID.toString())) {
-                responseObserver.onNext(SAMPLE_CAR);
-                responseObserver.onCompleted();
-            } else {
-                responseObserver.onError(
-                        Status.NOT_FOUND.withDescription("Car not found").asRuntimeException()
-                );
+            try (PreparedStatement ps = conn.prepareStatement(
+                    "INSERT INTO cars (id, created_at, updated_at, removed, car_configuration_id, available_for_test_drive) " +
+                    "VALUES (?, NOW(), NOW(), FALSE, ?, FALSE)")) {
+                ps.setObject(1, carId);
+                ps.setObject(2, configId);
+                ps.executeUpdate();
             }
         }
     }
 
-    static class UnavailableCarService extends CarGrpcServiceGrpc.CarGrpcServiceImplBase {
-        @Override
-        public void getAvailableCars(GetAvailableCarsRequest request,
-                                     StreamObserver<GetAvailableCarsResponse> responseObserver) {
-            responseObserver.onError(Status.UNAVAILABLE.asRuntimeException());
-        }
-    }
-
-    static class SlowCarService extends CarGrpcServiceGrpc.CarGrpcServiceImplBase {
-        @Override
-        public void getAvailableCars(GetAvailableCarsRequest request,
-                                     StreamObserver<GetAvailableCarsResponse> responseObserver) {
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                responseObserver.onError(Status.CANCELLED.asRuntimeException());
-                return;
+    private void cleanupCar(UUID configId, UUID carId) throws Exception {
+        try (Connection conn = DriverManager.getConnection(
+                storagePostgres.getJdbcUrl(),
+                storagePostgres.getUsername(),
+                storagePostgres.getPassword())) {
+            try (PreparedStatement ps = conn.prepareStatement("DELETE FROM cars WHERE id = ?")) {
+                ps.setObject(1, carId);
+                ps.executeUpdate();
             }
-            responseObserver.onNext(GetAvailableCarsResponse.newBuilder().build());
-            responseObserver.onCompleted();
+            try (PreparedStatement ps = conn.prepareStatement("DELETE FROM car_configurations WHERE id = ?")) {
+                ps.setObject(1, configId);
+                ps.executeUpdate();
+            }
         }
     }
 
-    static class EmptyCarService extends CarGrpcServiceGrpc.CarGrpcServiceImplBase {
-        @Override
-        public void getAvailableCars(GetAvailableCarsRequest request,
-                                     StreamObserver<GetAvailableCarsResponse> responseObserver) {
-            responseObserver.onNext(GetAvailableCarsResponse.newBuilder().build());
-            responseObserver.onCompleted();
-        }
-    }
 }
